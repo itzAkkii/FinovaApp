@@ -1,5 +1,6 @@
 package com.finance.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -273,27 +274,43 @@ public class JournalServiceImpl implements JournalService {
 					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
 					return new FinovaException("MPAY1019", "Please login to access this service");
 				});
-		log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
 
 		String goalId = finGoalDetails.getGoalId();
-		if (goalId == null) {
-			log.debug("[{}] Goal Id Not Found In Request:: ", httpSession.getId());
-			throw new FinovaException("FIN1002", "Internal issue! Please try later");
+		if (goalId == null || goalId.isBlank()) {
+			throw new FinovaException("FIN1002", "Goal ID not found");
 		}
 
 		FinGoalDetails existingGoalDetails = this.finGoalRepository.findById(goalId).orElseThrow(() -> {
 			log.debug("Goal Not found with ID: {}", goalId);
-			return new FinovaException("FIN1002", "Event Not Found");
+			return new FinovaException("FIN1002", "Goal Not Found");
 		});
 
-		Optional.ofNullable(finGoalDetails.getCurrentAmount()).ifPresent(existingGoalDetails::setCurrentAmount);
+		if (!existingGoalDetails.getUserId().equals(finovaUserDetails.getUserId())) {
+			throw new FinovaException("FIN1002", "Unauthorized access");
+		}
+
+		if (finGoalDetails.getCurrentAmount() != null && !finGoalDetails.getCurrentAmount().isBlank()) {
+			BigDecimal existingAmount = new BigDecimal(Optional.ofNullable(existingGoalDetails.getCurrentAmount())
+					.filter(amount -> !amount.isBlank()).orElse("0"));
+
+			BigDecimal addedAmount = new BigDecimal(finGoalDetails.getCurrentAmount());
+
+			if (addedAmount.compareTo(BigDecimal.ZERO) < 0) {
+				throw new FinovaException("FIN1002", "Added amount cannot be negative");
+			}
+
+			BigDecimal updatedAmount = existingAmount.add(addedAmount);
+			existingGoalDetails.setCurrentAmount(updatedAmount.stripTrailingZeros().toPlainString());
+		}
+
 		Optional.ofNullable(finGoalDetails.getTargetAmount()).ifPresent(existingGoalDetails::setTargetAmount);
 		Optional.ofNullable(finGoalDetails.getTargetDate()).ifPresent(existingGoalDetails::setTargetDate);
-		Optional.ofNullable(finGoalDetails.getGoal()).ifPresent(existingGoalDetails::setGoal);
 		Optional.ofNullable(finGoalDetails.getPriority()).ifPresent(existingGoalDetails::setPriority);
+		
 		existingGoalDetails.setDate(this.finUtils.getDate());
+		existingGoalDetails.setDateAndTime(this.finUtils.getDateAndTime());
 
-		log.debug("[{}] Event Updated Successfully {}", httpSession.getId(), existingGoalDetails);
+		log.debug("[{}] Goal Updated Successfully :: {}", httpSession.getId(), existingGoalDetails);
 		return finGoalRepository.save(existingGoalDetails);
 	}
 
@@ -317,11 +334,12 @@ public class JournalServiceImpl implements JournalService {
 		log.debug("[{}] Existing Goal Found {}:: ", httpSession.getId(), existingGoalDetails);
 		existingGoalDetails.setFlag("N");
 		existingGoalDetails.setDate(this.finUtils.getDate());
-		
-		FinGoalDetails updatedFinGoalDetails = Optional.of(this.finGoalRepository.save(existingGoalDetails)).orElseThrow(() -> {
-			log.error("[{}] ==> Failed to Update Goal to Database", httpSession.getId());
-			throw new FinovaException("FIN1002", "Internal issue! Please try later");
-		});
+
+		FinGoalDetails updatedFinGoalDetails = Optional.of(this.finGoalRepository.save(existingGoalDetails))
+				.orElseThrow(() -> {
+					log.error("[{}] ==> Failed to Update Goal to Database", httpSession.getId());
+					throw new FinovaException("FIN1002", "Internal issue! Please try later");
+				});
 
 		log.debug("[{}] Goal Deleted Service :: ", httpSession.getId());
 		return updatedFinGoalDetails;

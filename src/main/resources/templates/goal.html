@@ -176,6 +176,68 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
 @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:420px){.stats{grid-template-columns:1fr}}
+/* EDIT / DELETE */
+.goal-actions{display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px dashed #e2e8f0}
+.goal-btn{flex:1;border:none;border-radius:999px;padding:11px 14px;font-size:12.5px;font-weight:800;cursor:pointer;transition:.25s}
+.goal-btn.edit{color:#fff;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 18px -8px color-mix(in srgb,var(--a) 70%,transparent)}
+.goal-btn.delete{flex:0 0 auto;color:#be123c;background:#ffe4e6}
+.goal-btn:hover{transform:translateY(-2px)}
+.goal-btn.delete:hover{background:linear-gradient(135deg,#f43f5e,#be123c);color:#fff;box-shadow:0 10px 18px -8px rgba(190,18,60,.6)}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,27,75,.55);backdrop-filter:blur(6px);z-index:1000;
+  align-items:center;justify-content:center;padding:18px}
+.modal-overlay.open{display:flex}
+.goal-modal{position:relative;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;background:#fff;border-radius:28px;
+  padding:34px 30px 28px;box-shadow:0 30px 70px rgba(0,0,0,.3);animation:pop .3s ease}
+.goal-modal::before{content:"";position:absolute;left:0;right:0;top:0;height:7px;background:linear-gradient(90deg,#14b8a6,#6366f1,#ec4899,#f97316)}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+.goal-modal h2{font-family:var(--serif);color:var(--ink);font-size:25px;margin-bottom:6px}
+.modal-subtitle{color:#64748b;font-size:14px;margin-bottom:22px;line-height:1.6}
+.gm-group{margin-bottom:16px}
+.gm-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gm-group label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:7px}
+.req{color:#e11d48}
+.gm-group input,.gm-group select,.gm-group textarea{width:100%;padding:13px 15px;border:1.5px solid #e5e7f5;border-radius:14px;font-size:14px;
+  background:#f8f9ff;color:#334155;font-family:inherit;transition:.2s}
+.gm-group textarea{min-height:84px;resize:vertical;line-height:1.6}
+.gm-group input:hover,.gm-group select:hover,.gm-group textarea:hover{border-color:#c4b5fd}
+.gm-group input:focus,.gm-group select:focus,.gm-group textarea:focus{outline:none;border-color:#7c3aed;background:#fff;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+.gm-group input[readonly]{background:#f1f5f9;color:#475569;font-weight:800;cursor:not-allowed}
+.gm-add input{border-color:#99f6e4;background:#f0fdfa}
+.gm-hint{margin-top:6px;font-size:12px;color:#64748b}
+.gm-preview{margin:6px 0 4px;padding:18px 20px;border-radius:20px;color:#fff;
+  background:linear-gradient(135deg,#312e81,#6d28d9 60%,#be185d);box-shadow:0 16px 30px -10px rgba(109,40,217,.5)}
+.gm-preview-top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.gm-preview-top b{font-family:var(--serif);font-size:26px}
+.gm-bar{height:12px;margin:12px 0 10px;border-radius:999px;background:rgba(255,255,255,.2);overflow:hidden}
+.gm-bar span{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#fde68a,#f9a8d4,#86efac);
+  box-shadow:0 0 14px rgba(253,230,138,.8);transition:width .35s}
+.gm-sum{font-size:13px;font-weight:600;color:rgba(255,255,255,.92);line-height:1.6}
+.gm-preview.warn{background:linear-gradient(135deg,#7f1d1d,#be123c 60%,#f97316)}
+.gm-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:22px;padding-top:20px;border-top:1px dashed #e2e8f0}
+.gm-actions button{border:0;border-radius:999px;padding:13px 24px;cursor:pointer;font-weight:800;font-size:13px;transition:.25s}
+.gm-cancel{background:#f1f5f9;color:#475569}
+.gm-cancel:hover{background:#e2e8f0}
+.gm-save{background:var(--brand);color:#fff;box-shadow:0 10px 22px -6px rgba(124,58,237,.5)}
+.gm-danger{background:linear-gradient(135deg,#f43f5e,#be123c);color:#fff;box-shadow:0 10px 22px -6px rgba(190,18,60,.5)}
+.gm-save:hover,.gm-danger:hover{transform:translateY(-2px)}
+.gm-save:disabled,.gm-danger:disabled{opacity:.65;cursor:wait;transform:none}
+.delete-modal{max-width:420px;text-align:center}
+.delete-modal .gm-icon{width:70px;height:70px;margin:0 auto 16px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:32px;
+  background:linear-gradient(135deg,#fff1f2,#fecdd3);box-shadow:0 8px 20px rgba(190,24,93,.15)}
+.delete-modal .gm-actions{justify-content:center;border-top:none;padding-top:0}
+.delete-modal strong{color:var(--ink)}
+
+.toast-container{position:fixed;top:92px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:12px;width:min(380px,calc(100% - 30px));pointer-events:none}
+.toast{display:flex;align-items:center;gap:12px;padding:15px 18px;border-radius:18px;background:#fff;border-left:6px solid #22c55e;
+  box-shadow:0 16px 36px rgba(30,27,75,.2);font-size:13.5px;font-weight:700;color:#334155;pointer-events:auto;animation:toastIn .3s ease forwards}
+.toast.success{background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:#047857}
+.toast.error{border-left-color:#e11d48;background:linear-gradient(135deg,#fff1f2,#fff);color:#9f1239}
+.toast.hide{animation:toastOut .25s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
+@media (max-width:640px){.gm-row{grid-template-columns:1fr}.goal-modal{padding:30px 18px 22px}.toast-container{top:84px;right:15px}}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -213,6 +275,88 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
     </div>
 
 </div>
+
+<!-- EDIT GOAL MODAL -->
+<div class="modal-overlay" id="editGoalModal" role="dialog" aria-modal="true" aria-labelledby="editGoalHeading">
+    <div class="goal-modal">
+        <h2 id="editGoalHeading">✏️ Edit Goal</h2>
+        <p class="modal-subtitle">Update the details, or add the amount you have saved since the last update. The new amount is added to your existing current amount.</p>
+
+        <form id="editGoalForm">
+            <input type="hidden" id="editGoalId">
+
+            <div class="gm-group">
+                <label for="egTitle">🎯 Goal Title <span class="req">*</span></label>
+                <input type="text" id="egTitle" maxlength="150" placeholder="e.g. Buy Laptop" required>
+            </div>
+
+            <div class="gm-group">
+                <label for="egDescription">🗒️ Goal Description <span class="req">*</span></label>
+                <textarea id="egDescription" maxlength="5000" placeholder="Describe your financial goal..."></textarea>
+            </div>
+
+            <div class="gm-row">
+                <div class="gm-group">
+                    <label for="egTarget">💰 Target Amount <span class="req">*</span></label>
+                    <input type="number" id="egTarget" min="0" step="0.01" placeholder="e.g. 20">
+                </div>
+
+                <div class="gm-group">
+                    <label for="egPriority">⭐ Priority <span class="req">*</span></label>
+                    <select id="egPriority">
+                        <option value="LOW">🟢 Low</option>
+                        <option value="MEDIUM">🟡 Medium</option>
+                        <option value="HIGH">🔴 High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="gm-group">
+                <label for="egDate">📅 Target Date <span class="req">*</span></label>
+                <input type="date" id="egDate">
+            </div>
+
+            <div class="gm-row">
+                <div class="gm-group">
+                    <label for="egExisting">💵 Existing Current Amount</label>
+                    <input type="text" id="egExisting" readonly>
+                </div>
+
+                <div class="gm-group gm-add">
+                    <label for="egAdd">➕ Add Amount Now</label>
+                    <input type="number" id="egAdd" min="0" step="0.01" placeholder="e.g. 10">
+                </div>
+            </div>
+            <div class="gm-hint">Enter only the new amount you saved. It is added to the existing amount.</div>
+
+            <div class="gm-preview" id="egPreview">
+                <div class="gm-preview-top"><span>🎯 Updated Progress</span><b id="egPct">0%</b></div>
+                <div class="gm-bar"><span id="egBar"></span></div>
+                <div class="gm-sum" id="egSum">₹ 0 + ₹ 0 = ₹ 0 / ₹ 0</div>
+            </div>
+
+            <div class="gm-actions">
+                <button type="button" class="gm-cancel" onclick="closeEditGoal()">Cancel</button>
+                <button type="submit" class="gm-save" id="egSave">💾 Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- DELETE GOAL MODAL -->
+<div class="modal-overlay" id="deleteGoalModal" role="dialog" aria-modal="true" aria-labelledby="deleteGoalHeading">
+    <div class="goal-modal delete-modal">
+        <div class="gm-icon">🗑️</div>
+        <h2 id="deleteGoalHeading">Delete Goal?</h2>
+        <p class="modal-subtitle">Are you sure you want to delete <strong id="deleteGoalName">this goal</strong>? This action cannot be undone.</p>
+        <div class="gm-actions">
+            <button type="button" class="gm-cancel" onclick="closeDeleteGoal()">Cancel</button>
+            <button type="button" class="gm-danger" id="confirmDeleteGoal">🗑️ Delete</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
 <script>
 
@@ -333,10 +477,18 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
         goalGrid.innerHTML = "";
 
+        goalRecords = goalListData;
+
         goalListData.forEach((goal, index) => {
 
-            const goalName = goal.title || goal.goalName || "Untitled Goal";
-            const description = goal.subject || goal.description || "No description available.";
+            const goalId = getGoalId(goal);
+
+            // Show the saved goal title and goal description from the backend.
+            const goalName =
+                goal.goalTitle || goal.title || goal.goalName || "Untitled Goal";
+
+            const description =
+                goal.goal || goal.subject || goal.description || "No description available.";
             const targetAmount = parseFloat(goal.targetAmount || 0);
             const currentAmount = parseFloat(goal.currentAmount || 0);
 
@@ -412,7 +564,20 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
                     </span>
                 </div>
 
+                <div class="goal-actions">
+                    <button type="button" class="goal-btn edit">✏️ Edit / Add Amount</button>
+                    <button type="button" class="goal-btn delete">🗑️ Delete</button>
+                </div>
+
             `;
+
+            card.querySelector(".goal-btn.edit").addEventListener("click", function () {
+                openEditGoal(goalId);
+            });
+
+            card.querySelector(".goal-btn.delete").addEventListener("click", function () {
+                openDeleteGoal(goalId);
+            });
 
             goalGrid.appendChild(card);
         });
@@ -426,6 +591,8 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
     function showEmptyState() {
 
         const goalGrid = document.getElementById("goalGrid");
+
+        document.getElementById("goalStats").innerHTML = "";
 
         goalGrid.innerHTML = `
 
@@ -512,6 +679,405 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
         loadGoalList();
 
+    });
+
+
+    /* ==================================================
+       EDIT / DELETE GOALS
+       (adjust these two URLs if your controller uses
+        different paths)
+    ================================================== */
+
+    const UPDATE_GOAL_URL = "/finova/api/v1/update/goal";
+    const DELETE_GOAL_URL = "/finova/api/v1/delete/goal/";
+
+    let goalRecords = [];
+
+
+    function getGoalId(goal) {
+
+        const id = goal.goalId ?? goal.noteId ?? goal.id ?? goal.goalID;
+
+        return (id === undefined || id === null || id === "") ? "" : String(id);
+    }
+
+    function findGoal(goalId) {
+
+        return goalRecords.find(goal => getGoalId(goal) === String(goalId));
+    }
+
+    function toInputDate(value) {
+
+        if (!value) {
+            return "";
+        }
+
+        const text = String(value).trim().split(" ")[0].split("T")[0];
+
+        if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+            return text;
+        }
+
+        const match = text.match(/^(\d{2})[-\/](\d{2})[-\/](\d{4})$/);
+
+        return match ? match[3] + "-" + match[2] + "-" + match[1] : "";
+    }
+
+    function todayIso() {
+
+        const now = new Date();
+
+        return now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, "0") + "-" +
+            String(now.getDate()).padStart(2, "0");
+    }
+
+    function readNumber(id) {
+
+        const value = parseFloat(document.getElementById(id).value);
+
+        return Number.isFinite(value) ? value : 0;
+    }
+
+    function showToast(message, type) {
+
+        const container = document.getElementById("toastContainer");
+
+        const toast = document.createElement("div");
+
+        toast.className = "toast " + (type || "success");
+
+        toast.textContent = (type === "error" ? "❌ " : "✅ ") + message;
+
+        container.appendChild(toast);
+
+        setTimeout(function () {
+
+            toast.classList.add("hide");
+
+            setTimeout(function () { toast.remove(); }, 250);
+
+        }, 4000);
+    }
+
+    async function readJson(response) {
+
+        try {
+            return await response.json();
+        } catch (error) {
+            return {};
+        }
+    }
+
+    function isFailed(data) {
+
+        const status = String(data.RESP_STATUS || "").toUpperCase();
+
+        return status === "FAIL" || status === "FAILED" || status === "ERROR";
+    }
+
+    function backendMessage(data, fallback) {
+
+        return data.REASON || data.reason || data.INFORMATION || data.information || fallback;
+    }
+
+
+    /* ---------- EDIT ---------- */
+
+    function openEditGoal(goalId) {
+
+        const goal = goalId ? findGoal(goalId) : null;
+
+        if (!goal) {
+            showToast("Goal ID is missing in the goal list response, so it cannot be edited.", "error");
+            return;
+        }
+
+        document.getElementById("editGoalId").value = goalId;
+
+        document.getElementById("egTitle").value =
+            goal.goalTitle || goal.title || goal.goalName || "";
+
+        document.getElementById("egDescription").value =
+            goal.goal || goal.subject || goal.description || "";
+
+        document.getElementById("egTarget").value = goal.targetAmount ?? "";
+
+        const priority = String(goal.priority || "MEDIUM").toUpperCase();
+
+        document.getElementById("egPriority").value =
+            ["LOW", "MEDIUM", "HIGH"].includes(priority) ? priority : "MEDIUM";
+
+        document.getElementById("egDate").value = toInputDate(goal.targetDate);
+
+        document.getElementById("egDate").dataset.original = toInputDate(goal.targetDate);
+
+        document.getElementById("egExisting").value =
+            "₹ " + formatAmount(parseFloat(goal.currentAmount || 0));
+
+        document.getElementById("egExisting").dataset.value =
+            String(parseFloat(goal.currentAmount || 0));
+
+        document.getElementById("egAdd").value = "";
+
+        updateEditPreview();
+
+        document.getElementById("editGoalModal").classList.add("open");
+
+        document.getElementById("egAdd").focus();
+    }
+
+    function closeEditGoal() {
+
+        document.getElementById("editGoalModal").classList.remove("open");
+    }
+
+    // Updated current amount = existing current amount + newly added amount.
+    // Example: 5 + 10 = 15, then 15 + 3 = 18 (90% of 20).
+
+    function updateEditPreview() {
+
+        const existing = parseFloat(document.getElementById("egExisting").dataset.value || 0);
+        const added = readNumber("egAdd");
+        const target = readNumber("egTarget");
+
+        const updated = existing + added;
+
+        const percentage = target > 0 ? Math.min((updated / target) * 100, 100) : 0;
+
+        document.getElementById("egPct").textContent = percentage.toFixed(0) + "%";
+        document.getElementById("egBar").style.width = percentage + "%";
+
+        document.getElementById("egSum").textContent =
+            "₹ " + formatAmount(existing) +
+            " + ₹ " + formatAmount(added) +
+            " = ₹ " + formatAmount(updated) +
+            " / ₹ " + formatAmount(target) +
+            (target > 0 && updated > target ? "  ⚠️ exceeds target" : "");
+
+        document.getElementById("egPreview")
+            .classList.toggle("warn", target > 0 && updated > target);
+    }
+
+    document.getElementById("egAdd").addEventListener("input", updateEditPreview);
+    document.getElementById("egTarget").addEventListener("input", updateEditPreview);
+
+    document.getElementById("editGoalForm").addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const goalId = document.getElementById("editGoalId").value;
+
+        const title = document.getElementById("egTitle").value.trim();
+        const description = document.getElementById("egDescription").value.trim();
+        const priority = document.getElementById("egPriority").value;
+        const targetDate = document.getElementById("egDate").value;
+        const originalDate = document.getElementById("egDate").dataset.original || "";
+
+        const targetRaw = document.getElementById("egTarget").value;
+        const targetAmount = parseFloat(targetRaw);
+
+        const existing = parseFloat(document.getElementById("egExisting").dataset.value || 0);
+        const addedAmount = readNumber("egAdd");
+        const updatedCurrent = existing + addedAmount;
+
+        if (!goalId) {
+            showToast("Goal ID is missing.", "error");
+            return;
+        }
+
+        if (!title) {
+            showToast("Please enter goal title.", "error");
+            return;
+        }
+
+        if (!description) {
+            showToast("Please enter goal description.", "error");
+            return;
+        }
+
+        if (!targetRaw || !Number.isFinite(targetAmount) || targetAmount <= 0) {
+            showToast("Please enter a valid target amount.", "error");
+            return;
+        }
+
+        if (addedAmount < 0) {
+            showToast("Added amount cannot be negative.", "error");
+            return;
+        }
+
+        if (updatedCurrent > targetAmount) {
+            const room = Math.max(targetAmount - existing, 0);
+            showToast("Current amount cannot exceed target amount. You can add up to ₹ " + formatAmount(room) + ".", "error");
+            return;
+        }
+
+        if (!targetDate) {
+            showToast("Please select a target date.", "error");
+            return;
+        }
+
+        if (targetDate !== originalDate && targetDate < todayIso()) {
+            showToast("Target date cannot be in the past.", "error");
+            return;
+        }
+
+        // currentAmount  = updated total (existing + newly added)
+        // addedAmount    = only the newly added amount
+        const requestData = {
+            goalId: goalId,
+            goalTitle: title,
+            goal: description,
+            targetAmount: targetAmount,
+            currentAmount: Number(updatedCurrent.toFixed(2)),
+            addedAmount: Number(addedAmount.toFixed(2)),
+            priority: priority,
+            targetDate: targetDate
+        };
+
+        const saveButton = document.getElementById("egSave");
+
+        saveButton.disabled = true;
+        saveButton.textContent = "⏳ Saving...";
+
+        try {
+
+            const response = await fetch(UPDATE_GOAL_URL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                credentials: "same-origin",
+                body: JSON.stringify(requestData)
+            });
+
+            const data = await readJson(response);
+
+            if (!response.ok || isFailed(data)) {
+                throw new Error(backendMessage(data, "Unable to update goal."));
+            }
+
+            closeEditGoal();
+
+            showToast("Goal updated successfully!", "success");
+
+            loadGoalList();
+
+        } catch (error) {
+
+            console.error("Update Goal Error:", error);
+
+            showToast(error.message || "Unable to update goal.", "error");
+
+        } finally {
+
+            saveButton.disabled = false;
+            saveButton.textContent = "💾 Save Changes";
+        }
+    });
+
+
+    /* ---------- DELETE ---------- */
+
+    let pendingDeleteGoalId = "";
+
+    function openDeleteGoal(goalId) {
+
+        const goal = goalId ? findGoal(goalId) : null;
+
+        if (!goal) {
+            showToast("Goal ID is missing in the goal list response, so it cannot be deleted.", "error");
+            return;
+        }
+
+        pendingDeleteGoalId = goalId;
+
+        document.getElementById("deleteGoalName").textContent =
+            "“" + (goal.goalTitle || goal.title || goal.goalName || "this goal") + "”";
+
+        document.getElementById("deleteGoalModal").classList.add("open");
+    }
+
+    function closeDeleteGoal() {
+
+        document.getElementById("deleteGoalModal").classList.remove("open");
+
+        pendingDeleteGoalId = "";
+    }
+
+    document.getElementById("confirmDeleteGoal").addEventListener("click", async function () {
+
+        if (!pendingDeleteGoalId) {
+            return;
+        }
+
+        const goalId = pendingDeleteGoalId;
+        const button = this;
+
+        button.disabled = true;
+        button.textContent = "⏳ Deleting...";
+
+        try {
+
+            const response = await fetch(DELETE_GOAL_URL + encodeURIComponent(goalId), {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                credentials: "same-origin"
+            });
+
+            const data = await readJson(response);
+
+            if (!response.ok || isFailed(data)) {
+                throw new Error(backendMessage(data, "Unable to delete goal."));
+            }
+
+            closeDeleteGoal();
+
+            showToast("Goal deleted successfully!", "success");
+
+            loadGoalList();
+
+        } catch (error) {
+
+            console.error("Delete Goal Error:", error);
+
+            showToast(error.message || "Unable to delete goal.", "error");
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "🗑️ Delete";
+        }
+    });
+
+
+    /* ---------- CLOSE MODALS ---------- */
+
+    ["editGoalModal", "deleteGoalModal"].forEach(function (id) {
+
+        document.getElementById(id).addEventListener("click", function (event) {
+
+            if (event.target === this) {
+
+                if (id === "editGoalModal") {
+                    closeEditGoal();
+                } else {
+                    closeDeleteGoal();
+                }
+            }
+        });
+    });
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+            closeEditGoal();
+            closeDeleteGoal();
+        }
     });
 
 </script>
