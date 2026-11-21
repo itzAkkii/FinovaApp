@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finova - Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b4b; --text:#475569; --muted:#94a3b8;
+  --brand:linear-gradient(135deg,#4f46e5,#7c3aed 50%,#db2777);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--sans)}
+body{
+  min-height:100vh;color:var(--ink);overflow-x:hidden;
+  background:
+    radial-gradient(circle at 5% 10%,rgba(168,85,247,.16),transparent 28%),
+    radial-gradient(circle at 95% 8%,rgba(236,72,153,.14),transparent 26%),
+    radial-gradient(circle at 90% 85%,rgba(20,184,166,.12),transparent 28%),
+    radial-gradient(circle at 8% 90%,rgba(249,115,22,.10),transparent 26%),
+    linear-gradient(135deg,#faf9ff,#fff7fb,#f5fdfa);
+  background-attachment:fixed;
+}
+body::before{content:"FINOVA";position:fixed;font-family:var(--serif);font-size:150px;font-weight:700;letter-spacing:18px;
+  color:rgba(124,58,237,.03);transform:rotate(-18deg);white-space:nowrap;left:50%;top:42%;pointer-events:none;z-index:0}
+:focus-visible{outline:3px solid #a855f7;outline-offset:2px}
+
+/* HEADER */
+.topbar{position:sticky;top:0;z-index:50;min-height:72px;padding:12px 44px;background:var(--brand);
+  display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;color:#fff;
+  box-shadow:0 8px 30px rgba(79,70,229,.3)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;position:relative}
+.logo-f{font-family:var(--serif);font-size:26px;font-weight:700}
+.logo-leaf{position:absolute;top:-4px;right:-3px;width:17px;height:11px;
+  background:linear-gradient(135deg,#bbf7d0,#22c55e);border-radius:100% 0 100% 0;transform:rotate(-25deg)}
+.topbar-brand{font-family:var(--serif);font-size:27px;font-weight:700;letter-spacing:1.5px}
+.topbar-brand span{color:#fbcfe8}
+.nav-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.nav-btn{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);padding:10px 18px;
+  border-radius:999px;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;transition:.25s;backdrop-filter:blur(6px)}
+.nav-btn:hover{background:#fff;color:#6d28d9;transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,0,0,.18)}
+
+/* HERO */
+.container{width:90%;max-width:920px;margin:38px auto 60px;position:relative;z-index:1}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:36px 40px;margin-bottom:26px;color:#fff;
+  background:linear-gradient(120deg,#4338ca,#7c3aed 45%,#db2777 80%,#f97316);box-shadow:0 24px 50px rgba(124,58,237,.30)}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%}
+.hero::before{width:260px;height:260px;right:-60px;top:-90px;background:rgba(255,255,255,.14)}
+.hero::after{width:170px;height:170px;right:150px;bottom:-90px;background:rgba(255,255,255,.10)}
+.hero-art{position:absolute;right:38px;top:50%;transform:translateY(-50%) rotate(8deg);font-size:88px;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.25));animation:floaty 5s ease-in-out infinite}
+@keyframes floaty{50%{transform:translateY(-58%) rotate(2deg)}}
+.diary-badge{display:inline-block;padding:7px 14px;margin-bottom:14px;border-radius:999px;background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+.page-heading h1{font-family:var(--serif);font-size:38px;line-height:1.15;position:relative}
+.page-heading p{margin-top:10px;max-width:480px;font-size:15px;line-height:1.6;color:rgba(255,255,255,.9);position:relative}
+
+/* FORM CARD */
+.diary-card{position:relative;padding:34px;border-radius:28px;border:1.5px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#6366f1,#a855f7,#ec4899,#f97316) border-box;
+  box-shadow:0 2px 4px rgba(30,27,75,.04),0 20px 40px -10px rgba(30,27,75,.14),0 40px 80px -24px rgba(124,58,237,.35)}
+
+/* ENTRY TYPE TILES */
+.entry-type-section{margin-bottom:26px}
+.entry-type-section > label{display:block;margin-bottom:12px}
+#entryType{display:none}
+.type-tiles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.type-tile{display:flex;align-items:center;gap:14px;text-align:left;cursor:pointer;padding:16px 18px;border-radius:18px;
+  border:1.5px solid #e9e5ff;background:#faf9ff;color:var(--ink);transition:.25s}
+.type-tile .ico{flex:none;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;background:#fff;box-shadow:0 6px 14px rgba(30,27,75,.08)}
+.type-tile b{display:block;font-size:15px}
+.type-tile small{display:block;margin-top:2px;font-size:12px;color:var(--muted);font-weight:500}
+.type-tile:hover{transform:translateY(-2px);border-color:#c4b5fd}
+.type-tile.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,#4f46e5,#7c3aed,#db2777);
+  box-shadow:0 14px 28px -8px rgba(124,58,237,.5)}
+.type-tile.active.goal{background:linear-gradient(135deg,#0ea5e9,#14b8a6,#22c55e);box-shadow:0 14px 28px -8px rgba(20,184,166,.5)}
+.type-tile.active small{color:rgba(255,255,255,.85)}
+.type-tile.active .ico{background:rgba(255,255,255,.22);box-shadow:none}
+.entry-type-info{margin-top:12px;color:#64748b;font-size:13px;padding-left:4px}
+
+/* FIELDS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:20px}
+.form-group{display:flex;flex-direction:column}
+.full-width{margin-bottom:20px}
+label{color:var(--ink);font-weight:700;margin-bottom:8px;font-size:14px}
+input,select,textarea{width:100%;padding:14px 16px;border:1.5px solid #e5e7f5;border-radius:14px;outline:none;
+  font-size:15px;color:#334155;background:#f8f9ff;transition:.2s}
+input:hover,select:hover,textarea:hover{border-color:#c4b5fd}
+input:focus,select:focus,textarea:focus{border-color:#7c3aed;background:#fff;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+input::placeholder,textarea::placeholder{color:#a8b0c4}
+textarea{min-height:220px;resize:vertical;line-height:1.7}
+.target-date-info{margin-top:8px;color:#64748b;font-size:12px}
+
+.note-info{display:flex;align-items:center;gap:12px;margin:4px 0 6px;padding:14px 16px;border-radius:14px;
+  background:linear-gradient(135deg,#fffbeb,#fff1f2);border:1px solid #fde68a;color:#78716c;font-size:13px;line-height:1.6}
+
+/* GOAL PROGRESS */
+.goal-preview{display:none;margin:4px 0 20px;padding:20px;border-radius:20px;color:#fff;
+  background:linear-gradient(135deg,#312e81,#6d28d9 60%,#be185d);box-shadow:0 16px 30px -10px rgba(109,40,217,.5)}
+.goal-preview-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;font-weight:700}
+#goalPercentage{font-family:var(--serif);font-size:26px}
+.goal-progress{width:100%;height:12px;background:rgba(255,255,255,.2);border-radius:999px;overflow:hidden}
+.goal-progress-bar{width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg,#fde68a,#f9a8d4,#86efac);
+  box-shadow:0 0 14px rgba(253,230,138,.8);transition:width .4s}
+.goal-progress-text{margin-top:10px;color:rgba(255,255,255,.88);font-size:13px;font-weight:600;text-align:right}
+
+/* BUTTON + MESSAGES */
+.button-row{display:flex;justify-content:flex-end;align-items:center;margin-top:28px;padding-top:22px;border-top:1px dashed #e2e8f0}
+.save-btn{border:none;padding:16px 32px;border-radius:999px;background:var(--brand);color:#fff;font-size:15px;font-weight:700;
+  cursor:pointer;transition:.3s;box-shadow:0 12px 26px -6px rgba(124,58,237,.5)}
+.save-btn:hover{transform:translateY(-3px);box-shadow:0 18px 32px -6px rgba(219,39,119,.5)}
+.save-btn:active{transform:scale(.97)}
+.save-btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
+.message{display:none;margin-bottom:20px;padding:14px 18px;border-radius:14px;font-size:14px;font-weight:600}
+.success{display:block;background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:#047857;border-left:5px solid #10b981}
+.error{display:block;background:linear-gradient(135deg,#fff1f2,#ffe4e6);color:#9f1239;border-left:5px solid #e11d48}
+
+@media(max-width:700px){
+  .topbar{padding:14px 18px}
+  .topbar-brand{font-size:23px}
+  .nav-actions{width:100%;justify-content:center}
+  .container{width:94%;margin:26px auto 50px}
+  .hero{padding:28px 24px}
+  .hero-art{font-size:54px;right:18px;top:26px;transform:rotate(8deg);animation:none}
+  .page-heading h1{font-size:28px}
+  .diary-card{padding:24px 18px}
+  .form-row,.type-tiles{grid-template-columns:1fr;gap:16px}
+  .save-btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+    <div class="logo">
+        <div class="logo-icon"><div class="logo-f">F</div><div class="logo-leaf"></div></div>
+        <div class="topbar-brand">FIN<span>OVA</span></div>
+    </div>
+
+    <div class="nav-actions">
+        <a class="nav-btn" href="/customer/home">← Dashboard</a>
+        <a class="nav-btn" href="/finova/api/v1/view/diary">📖 View Diary</a>
+        <a class="nav-btn" href="/finova/api/v1/view/goal">🎯 View Goals</a>
+    </div>
+</header>
+
+<!-- MAIN -->
+<div class="container">
+
+    <section class="hero page-heading">
+        <div class="hero-art">✍️</div>
+        <div class="diary-badge">✨ Personal Journal</div>
+        <h1 id="pageTitle">📝 Write Your Diary</h1>
+        <p id="pageSubtitle">Capture your thoughts, financial activities and important moments.</p>
+    </section>
+
+    <div class="diary-card">
+
+        <div id="message" class="message"></div>
+
+        <!-- ENTRY TYPE -->
+        <div class="entry-type-section">
+
+            <label for="entryType">📌 Entry Type</label>
+
+            <select id="entryType" onchange="changeEntryType()">
+                <option value="DIARY">📖 Diary</option>
+                <option value="FINANCIAL_GOAL">🎯 Financial Goal</option>
+            </select>
+
+            <div class="type-tiles">
+                <button type="button" class="type-tile active" data-type="DIARY" onclick="pickType('DIARY')">
+                    <span class="ico">📖</span>
+                    <span><b>Diary</b><small>Thoughts &amp; learnings</small></span>
+                </button>
+                <button type="button" class="type-tile goal" data-type="FINANCIAL_GOAL" onclick="pickType('FINANCIAL_GOAL')">
+                    <span class="ico">🎯</span>
+                    <span><b>Financial Goal</b><small>Target &amp; progress</small></span>
+                </button>
+            </div>
+
+            <div id="entryTypeInfo" class="entry-type-info">
+                Write your daily financial thoughts, activities and learnings.
+            </div>
+
+        </div>
+
+        <!-- DIARY FIELDS -->
+        <div id="diaryFields">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="title">📝 Diary Title</label>
+                    <input type="text" id="title" placeholder="e.g. Today's Financial Thoughts" maxlength="150">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">🏷️ Category</label>
+                    <select id="category">
+                        <option value="">Select Category</option>
+                        <option value="Finance">💰 Finance</option>
+                        <option value="Savings">🏦 Savings</option>
+                        <option value="Investment">📊 Investment</option>
+                        <option value="Trading">📈 Trading</option>
+                        <option value="Goals">🎯 Goals</option>
+                        <option value="Personal">💭 Personal</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="full-width">
+                <div class="form-group">
+                    <label for="subject">✍️ Your Diary *</label>
+                    <textarea id="subject"
+                              placeholder="Write your thoughts here...
+
+Example:
+Today I reviewed my expenses and noticed that I spent more on food delivery. I will try to reduce unnecessary expenses next month."
+                              maxlength="5000"></textarea>
+                </div>
+            </div>
+
+            <div class="note-info">
+                💡
+                <span>Your diary can include financial thoughts, investment ideas, goals, learnings or anything important about your day.</span>
+            </div>
+
+        </div>
+
+        <!-- FINANCIAL GOAL FIELDS -->
+        <div id="goalFields" style="display:none;">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="goalName">🎯 Goal Name *</label>
+                    <input type="text" id="goalName" placeholder="e.g. Emergency Fund" maxlength="150">
+                </div>
+
+                <div class="form-group">
+                    <label for="targetAmount">💰 Target Amount *</label>
+                    <input type="number" id="targetAmount" placeholder="e.g. 100000" min="0" step="0.01" oninput="updateGoalProgress()">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="currentAmount">💵 Current Amount</label>
+                    <input type="number" id="currentAmount" placeholder="e.g. 35000" min="0" step="0.01" value="0" oninput="updateGoalProgress()">
+                </div>
+
+                <div class="form-group">
+                    <label for="goalPriority">⭐ Goal Priority</label>
+                    <select id="goalPriority">
+                        <option value="">Select Priority</option>
+                        <option value="LOW">🟢 Low</option>
+                        <option value="MEDIUM">🟡 Medium</option>
+                        <option value="HIGH">🔴 High</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TARGET DATE -->
+            <div class="full-width">
+                <div class="form-group">
+                    <label for="targetDate">📅 Target Date *</label>
+                    <input type="date" id="targetDate" min="">
+                    <div class="target-date-info">Set the date by which you want to achieve this financial goal.</div>
+                </div>
+            </div>
+
+            <div class="full-width">
+                <div class="form-group">
+                    <label for="goalSubject">✍️ Goal Description *</label>
+                    <textarea id="goalSubject"
+                              placeholder="Describe your financial goal...
+
+Example:
+I want to build an emergency fund of ₹1,00,000."
+                              maxlength="5000"></textarea>
+                </div>
+            </div>
+
+            <!-- GOAL PROGRESS -->
+            <div id="goalPreview" class="goal-preview">
+                <div class="goal-preview-title">
+                    <span>🎯 Goal Progress</span>
+                    <span id="goalPercentage">0%</span>
+                </div>
+                <div class="goal-progress">
+                    <div id="goalProgressBar" class="goal-progress-bar"></div>
+                </div>
+                <div id="goalProgressText" class="goal-progress-text">₹ 0 / ₹ 0</div>
+            </div>
+
+            <div class="note-info">
+                💡
+                <span>Set your target amount and current amount to track your financial goal progress.</span>
+            </div>
+
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <div class="button-row">
+            <button type="button" id="saveButton" class="save-btn" onclick="writeEntry()">📖 Save Diary</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ==================================================
+   COMMON API ERROR HANDLING
+================================================== */
+
+function getBackendErrorMessage(data) {
+
+    const candidates = [
+        data?.REASON,
+        data?.reason,
+        data?.responseData?.REASON,
+        data?.responseData?.reason,
+        data?.respMessage?.REASON,
+        data?.respMessage?.reason,
+        data?.data?.REASON,
+        data?.data?.reason
+    ];
+
+    const reason = candidates.find(
+        value => typeof value === "string" && value.trim()
+    );
+
+    return reason
+        ? reason.trim()
+        : "Unable to process your request. Please try again.";
+}
+
+async function readApiResponse(response) {
+
+    const responseText = await response.text();
+
+    if (!responseText || !responseText.trim()) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(responseText);
+    } catch (error) {
+        return {};
+    }
+}
+
+function isApiFailure(response, data) {
+
+    return !response.ok ||
+        data?.RESP_STATUS?.toString().toUpperCase() === "FAIL" ||
+        data?.respStatus?.toString().toUpperCase() === "FAIL";
+}
+
+
+/* ==================================================
+   ENTRY TYPE CHANGE
+================================================== */
+
+function pickType(type) {
+
+    document.getElementById("entryType").value = type;
+    changeEntryType();
+}
+
+function changeEntryType() {
+
+    const entryType = document.getElementById("entryType").value;
+
+    const diaryFields = document.getElementById("diaryFields");
+    const goalFields = document.getElementById("goalFields");
+    const entryTypeInfo = document.getElementById("entryTypeInfo");
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubtitle = document.getElementById("pageSubtitle");
+    const saveButton = document.getElementById("saveButton");
+
+    document.querySelectorAll(".type-tile").forEach(tile => {
+        tile.classList.toggle("active", tile.dataset.type === entryType);
+    });
+
+    if (entryType === "FINANCIAL_GOAL") {
+
+        diaryFields.style.display = "none";
+        goalFields.style.display = "block";
+
+        entryTypeInfo.innerText =
+            "Create and track a financial goal with target and current amount.";
+
+        pageTitle.innerText = "🎯 Create Financial Goal";
+
+        pageSubtitle.innerText =
+            "Set a target and track your financial progress.";
+
+        saveButton.innerText = "🎯 Save Financial Goal";
+
+        document.getElementById("goalPreview").style.display = "block";
+
+        updateGoalProgress();
+
+    } else {
+
+        diaryFields.style.display = "block";
+        goalFields.style.display = "none";
+
+        entryTypeInfo.innerText =
+            "Write your daily financial thoughts, activities and learnings.";
+
+        pageTitle.innerText = "📝 Write Your Diary";
+
+        pageSubtitle.innerText =
+            "Capture your thoughts, financial activities and important moments.";
+
+        saveButton.innerText = "📖 Save Diary";
+    }
+
+    clearMessage();
+}
+
+
+/* ==================================================
+   GOAL PROGRESS
+================================================== */
+
+function updateGoalProgress() {
+
+    const targetAmount = parseFloat(
+        document.getElementById("targetAmount").value || 0
+    );
+
+    const currentAmount = parseFloat(
+        document.getElementById("currentAmount").value || 0
+    );
+
+    const percentageElement =
+        document.getElementById("goalPercentage");
+
+    const progressBar =
+        document.getElementById("goalProgressBar");
+
+    const progressText =
+        document.getElementById("goalProgressText");
+
+    if (targetAmount <= 0) {
+
+        percentageElement.innerText = "0%";
+        progressBar.style.width = "0%";
+        progressText.innerText = "₹ 0 / ₹ 0";
+
+        return;
+    }
+
+    const percentage = Math.min(
+        (currentAmount / targetAmount) * 100,
+        100
+    );
+
+    percentageElement.innerText =
+        percentage.toFixed(0) + "%";
+
+    progressBar.style.width = percentage + "%";
+
+    progressText.innerText =
+        "₹ " + formatAmount(currentAmount) +
+        " / ₹ " + formatAmount(targetAmount);
+}
+
+
+/* ==================================================
+   FORMAT AMOUNT
+================================================== */
+
+function formatAmount(amount) {
+
+    return Number(amount || 0).toLocaleString(
+        "en-IN",
+        {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }
+    );
+}
+
+
+/* ==================================================
+   SAVE ENTRY
+================================================== */
+
+function writeEntry() {
+
+    const entryType = document.getElementById("entryType").value;
+
+    if (entryType === "FINANCIAL_GOAL") {
+        saveFinancialGoal();
+    } else {
+        saveDiary();
+    }
+}
+
+
+/* ==================================================
+   SAVE DIARY
+================================================== */
+
+function saveDiary() {
+
+    const title = document.getElementById("title").value.trim();
+    const subject = document.getElementById("subject").value.trim();
+    const category = document.getElementById("category").value;
+
+    if (!title) {
+        showMessage("Please enter diary title.", "error");
+        document.getElementById("title").focus();
+        return;
+    }
+
+    if (!category) {
+        showMessage("Please select a category.", "error");
+        document.getElementById("category").focus();
+        return;
+    }
+
+    if (!subject) {
+        showMessage("Please write something in your diary.", "error");
+        document.getElementById("subject").focus();
+        return;
+    }
+
+    const diaryData = {
+
+        entryType: "DIARY",
+        title: title,
+        subject: subject,
+        category: category
+
+    };
+
+    saveData(
+        diaryData,
+        "📖 Diary written successfully!",
+        "📖 Save Diary"
+    );
+}
+
+
+/* ==================================================
+   SAVE FINANCIAL GOAL
+================================================== */
+
+function saveFinancialGoal() {
+
+    const goalName =
+        document.getElementById("goalName").value.trim();
+
+    const targetAmount =
+        document.getElementById("targetAmount").value;
+
+    const currentAmount =
+        document.getElementById("currentAmount").value || "0";
+
+    const goalPriority =
+        document.getElementById("goalPriority").value;
+
+    const targetDate =
+        document.getElementById("targetDate").value;
+
+    const goalSubject =
+        document.getElementById("goalSubject").value.trim();
+
+    if (!goalName) {
+        showMessage("Please enter goal name.", "error");
+        document.getElementById("goalName").focus();
+        return;
+    }
+
+    if (!targetAmount || parseFloat(targetAmount) <= 0) {
+        showMessage("Please enter a valid target amount.", "error");
+        document.getElementById("targetAmount").focus();
+        return;
+    }
+
+    if (parseFloat(currentAmount) < 0) {
+        showMessage("Current amount cannot be negative.", "error");
+        document.getElementById("currentAmount").focus();
+        return;
+    }
+
+    if (parseFloat(currentAmount) > parseFloat(targetAmount)) {
+        showMessage(
+            "Current amount cannot exceed target amount.",
+            "error"
+        );
+        document.getElementById("currentAmount").focus();
+        return;
+    }
+
+    if (!goalPriority) {
+        showMessage("Please select goal priority.", "error");
+        document.getElementById("goalPriority").focus();
+        return;
+    }
+
+    if (!targetDate) {
+        showMessage("Please select a target date.", "error");
+        document.getElementById("targetDate").focus();
+        return;
+    }
+
+    if (targetDate < getLocalToday()) {
+        showMessage("Target date cannot be in the past.", "error");
+        document.getElementById("targetDate").focus();
+        return;
+    }
+
+    if (!goalSubject) {
+        showMessage("Please enter goal description.", "error");
+        document.getElementById("goalSubject").focus();
+        return;
+    }
+
+    const goalData = {
+
+        entryType: "FINANCIAL_GOAL",
+        title: goalName,
+        subject: goalSubject,
+        currentAmount: parseFloat(currentAmount),
+        targetAmount: parseFloat(targetAmount),
+        priority: goalPriority,
+        targetDate: targetDate
+
+    };
+
+    saveData(
+        goalData,
+        "🎯 Financial goal saved successfully!",
+        "🎯 Save Financial Goal"
+    );
+}
+
+
+/* ==================================================
+   COMMON SAVE API
+================================================== */
+
+function saveData(requestData, successMessage, buttonText) {
+
+    const saveButton = document.getElementById("saveButton");
+
+    saveButton.disabled = true;
+    saveButton.innerText = "Saving...";
+
+    fetch("/finova/api/v1/add/journal", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+
+        credentials: "same-origin",
+
+        body: JSON.stringify(requestData)
+
+    })
+
+    .then(async response => {
+
+        const data = await readApiResponse(response);
+
+        console.log("Journal API HTTP Status:", response.status);
+        console.log("Journal API Response:", data);
+
+        if (isApiFailure(response, data)) {
+            throw new Error(getBackendErrorMessage(data));
+        }
+
+        return data;
+
+    })
+
+    .then(data => {
+
+        showMessage(
+            data.respMessage || successMessage,
+            "success"
+        );
+
+        clearForm();
+
+    })
+
+    .catch(error => {
+
+        console.error("Journal Save Error:", error);
+
+        showMessage(
+            error.message ||
+            "Unable to process your request. Please try again.",
+            "error"
+        );
+
+    })
+
+    .finally(() => {
+
+        saveButton.disabled = false;
+
+        saveButton.innerText = buttonText;
+
+    });
+}
+
+
+/* ==================================================
+   CLEAR FORM
+================================================== */
+
+function clearForm() {
+
+    document.getElementById("title").value = "";
+    document.getElementById("subject").value = "";
+    document.getElementById("category").value = "";
+
+    document.getElementById("goalName").value = "";
+    document.getElementById("targetAmount").value = "";
+    document.getElementById("currentAmount").value = "0";
+    document.getElementById("goalPriority").value = "";
+    document.getElementById("targetDate").value = "";
+    document.getElementById("goalSubject").value = "";
+
+    updateGoalProgress();
+}
+
+
+/* ==================================================
+   MESSAGE
+================================================== */
+
+function showMessage(text, type) {
+
+    const message = document.getElementById("message");
+
+    message.innerText = text;
+    message.className = "message " + type;
+
+}
+
+function clearMessage() {
+
+    const message = document.getElementById("message");
+
+    message.innerText = "";
+    message.className = "message";
+
+}
+
+
+/* ==================================================
+   LOCAL DATE
+================================================== */
+
+function getLocalToday() {
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return year + "-" + month + "-" + day;
+}
+
+
+/* ==================================================
+   INITIAL STATE
+================================================== */
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    document.getElementById("targetDate").min = getLocalToday();
+
+    changeEntryType();
+
+});
+
+</script>
+
+</body>
+</html>

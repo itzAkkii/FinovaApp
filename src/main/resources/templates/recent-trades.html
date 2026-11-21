@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finova - Recent Trades</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 8% 0%, rgba(124, 58, 237, .13), transparent 38%),
+                radial-gradient(circle at 92% 12%, rgba(236, 72, 153, .11), transparent 36%),
+                linear-gradient(135deg, #eef2ff, #fdf2f8, #ecfeff);
+            background-attachment: fixed;
+            color: #312e81;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            min-height: 62px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 22px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .14);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 23px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .logo-icon {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .logo-leaf {
+            position: absolute;
+            width: 12px;
+            height: 8px;
+            top: 2px;
+            right: 1px;
+            background: #86efac;
+            border-radius: 100% 0 100% 0;
+            transform: rotate(-25deg);
+        }
+
+        .logo span {
+            color: #fbcfe8;
+        }
+
+        .back-btn {
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            border: 1px solid rgba(255, 255, 255, .6);
+            padding: 11px 18px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ffffff, #f5f3ff 60%, #fce7f3);
+            color: #6d28d9;
+            white-space: nowrap;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .18), inset 0 1px 0 #fff;
+            transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, .25);
+        }
+
+        /* ================= MAIN CONTENT ================= */
+
+        .container {
+            width: 100%;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 22px 18px;
+        }
+
+        .page-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .page-heading h1 {
+            font-size: 23px;
+            color: #312e81;
+        }
+
+        .page-heading p {
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* ================= PREMIUM TRADING SUMMARY CARDS ================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .summary-card {
+            --accent: #a5b4fc;
+            --accent-2: #818cf8;
+            --glow: rgba(99, 102, 241, .35);
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            min-width: 0;
+            min-height: 196px;
+            padding: 20px 21px 18px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 24px;
+            color: #fff;
+            background: linear-gradient(135deg, #312e81, #4f46e5 58%, #818cf8);
+            border: 1px solid transparent;
+            box-shadow:
+                0 14px 30px rgba(49, 46, 129, .18),
+                0 2px 6px rgba(49, 46, 129, .10),
+                inset 0 1px 0 rgba(255, 255, 255, .30),
+                inset 0 -1px 0 rgba(0, 0, 0, .10);
+            transition: transform .3s cubic-bezier(.2, .8, .2, 1), box-shadow .3s ease;
+            animation: cardAppear .6s cubic-bezier(.2, .8, .2, 1) both;
+        }
+
+        .summary-card:nth-child(1) { animation-delay: .04s; }
+        .summary-card:nth-child(2) { animation-delay: .12s; }
+        .summary-card:nth-child(3) { animation-delay: .20s; }
+        .summary-card:nth-child(4) { animation-delay: .28s; }
+
+        .summary-card:hover {
+            transform: translateY(-8px) scale(1.012);
+            box-shadow:
+                0 26px 46px var(--glow),
+                0 4px 10px rgba(0, 0, 0, .08),
+                inset 0 1px 0 rgba(255, 255, 255, .38);
+        }
+
+        /* Gradient border ring */
+        .summary-card .ring {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            border-radius: inherit;
+            padding: 1px;
+            pointer-events: none;
+            background: linear-gradient(140deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, .05) 40%, rgba(255, 255, 255, .35));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+        }
+
+        /* Glow orbs */
+        .summary-card .orb {
+            position: absolute;
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(2px);
+        }
+
+        .summary-card .orb-1 {
+            width: 210px;
+            height: 210px;
+            top: -110px;
+            right: -60px;
+            background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, .34), rgba(255, 255, 255, .04) 65%);
+            transition: transform .6s ease;
+        }
+
+        .summary-card .orb-2 {
+            width: 150px;
+            height: 150px;
+            left: -60px;
+            bottom: -80px;
+            background: radial-gradient(circle, var(--accent-2), transparent 70%);
+            opacity: .45;
+            transition: transform .6s ease;
+        }
+
+        .summary-card:hover .orb-1 { transform: scale(1.2) translate(-8px, 8px); }
+        .summary-card:hover .orb-2 { transform: scale(1.25) translate(10px, -6px); }
+
+        /* Light sweep on hover */
+        .summary-card::after {
+            content: "";
+            position: absolute;
+            z-index: 2;
+            top: 0;
+            left: -80%;
+            width: 55%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .22), transparent);
+            transform: skewX(-18deg);
+            transition: left .8s ease;
+        }
+
+        .summary-card:hover::after { left: 130%; }
+
+        .capital-card {
+            --accent: #c7d2fe;
+            --accent-2: #6366f1;
+            --glow: rgba(79, 70, 229, .42);
+            background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 52%, #6366f1 100%);
+        }
+
+        .profit-card {
+            --accent: #86efac;
+            --accent-2: #10b981;
+            --glow: rgba(5, 150, 105, .40);
+            background: linear-gradient(135deg, #022c22 0%, #047857 52%, #10b981 100%);
+        }
+
+        .loss-card {
+            --accent: #fda4af;
+            --accent-2: #f43f5e;
+            --glow: rgba(225, 29, 72, .38);
+            background: linear-gradient(135deg, #4c0519 0%, #be123c 52%, #f43f5e 100%);
+        }
+
+        .net-card {
+            --accent: #f0abfc;
+            --accent-2: #c026d3;
+            --glow: rgba(147, 51, 234, .42);
+            background: linear-gradient(135deg, #3b0764 0%, #7e22ce 50%, #db2777 100%);
+        }
+
+        .summary-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .summary-label-wrap {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-width: 0;
+        }
+
+        .summary-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255, 255, 255, .32);
+            border-radius: 14px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, .30), rgba(255, 255, 255, .08));
+            box-shadow: 0 6px 14px rgba(0, 0, 0, .16), inset 0 1px 0 rgba(255, 255, 255, .35);
+            font-size: 20px;
+            font-weight: 800;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .summary-label {
+            color: rgba(255, 255, 255, .95);
+            font-size: 13px;
+            font-weight: 750;
+            letter-spacing: .3px;
+            line-height: 1.3;
+        }
+
+        .summary-tag {
+            flex-shrink: 0;
+            padding: 5px 10px;
+            border: 1px solid rgba(255, 255, 255, .28);
+            border-radius: 20px;
+            color: #fff;
+            background: rgba(255, 255, 255, .14);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .summary-value {
+            position: relative;
+            z-index: 1;
+            color: #fff;
+            font-size: clamp(24px, 2.3vw, 33px);
+            font-weight: 850;
+            letter-spacing: -.6px;
+            line-height: 1.15;
+            font-variant-numeric: tabular-nums;
+            overflow-wrap: anywhere;
+            text-shadow: 0 3px 12px rgba(0, 0, 0, .22);
+        }
+
+        .summary-value.positive,
+        .summary-value.negative { color: #fff; }
+
+        /* Stat pill under value */
+        .summary-meta {
+            display: inline-flex;
+            align-items: center;
+            align-self: flex-start;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 4px 10px 4px 8px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, .20);
+            border: 1px solid rgba(255, 255, 255, .16);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1px;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .summary-meta .arrow {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            font-size: 9px;
+            background: rgba(255, 255, 255, .22);
+        }
+
+        .summary-meta.up .arrow { background: rgba(134, 239, 172, .35); color: #dcfce7; }
+        .summary-meta.down .arrow { background: rgba(253, 164, 175, .38); color: #ffe4e6; }
+
+        /* Bottom: sparkline / progress */
+        .summary-visual {
+            margin-top: auto;
+            padding-top: 12px;
+        }
+
+        .spark {
+            display: block;
+            width: 100%;
+            height: 34px;
+            opacity: .92;
+        }
+
+        .spark path.line {
+            fill: none;
+            stroke: rgba(255, 255, 255, .92);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
+            animation: drawLine 1.4s .5s ease forwards;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .25));
+        }
+
+        .spark path.area {
+            fill: url(#none);
+            fill: rgba(255, 255, 255, .13);
+            stroke: none;
+        }
+
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .progress-track {
+            position: relative;
+            flex: 1;
+            height: 8px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, .25);
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .25);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #fde68a, #86efac, #34d399);
+            box-shadow: 0 0 12px rgba(134, 239, 172, .7);
+            transition: width 1.1s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .progress-text {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, .95);
+        }
+
+        .summary-foot {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 9px;
+            color: rgba(255, 255, 255, .78);
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: .15px;
+        }
+
+        .summary-foot-dot {
+            position: relative;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .summary-foot-dot::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 1px solid var(--accent);
+            opacity: 0;
+            animation: pulseRing 2.4s ease-out infinite;
+        }
+
+        /* Net card state colours */
+        .net-card.net-up {
+            --accent: #86efac;
+            --glow: rgba(16, 185, 129, .42);
+            background: linear-gradient(135deg, #3b0764 0%, #6d28d9 48%, #059669 100%);
+        }
+
+        .net-card.net-down {
+            --accent: #fda4af;
+            --glow: rgba(225, 29, 72, .40);
+            background: linear-gradient(135deg, #3b0764 0%, #9d174d 50%, #e11d48 100%);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(16px) scale(.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes pulseRing {
+            0% { transform: scale(.6); opacity: .8; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        @media (max-width: 1100px) {
+            .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 520px) {
+            .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .summary-card { min-height: 172px; padding: 14px 12px; border-radius: 18px; }
+            .summary-top { align-items: flex-start; margin-bottom: 12px; }
+            .summary-label-wrap { gap: 7px; }
+            .summary-icon { flex-basis: 32px; width: 32px; height: 32px; border-radius: 10px; font-size: 16px; }
+            .summary-label { font-size: 10.5px; }
+            .summary-tag { display: none; }
+            .summary-value { font-size: clamp(16px, 4.8vw, 21px); }
+            .summary-meta { font-size: 9.5px; padding: 3px 8px 3px 6px; margin-top: 8px; }
+            .summary-foot { font-size: 9px; }
+            .spark { height: 26px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .summary-card,
+            .spark path.line,
+            .summary-foot-dot::after { animation: none; }
+            .spark path.line { stroke-dashoffset: 0; }
+            .summary-card, .summary-card::after, .progress-fill { transition: none; }
+        }
+
+        /* ================= TRADE TABS / PREMIUM BUTTONS ================= */
+
+        .trade-tabs {
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .trade-tab,
+        .add-trade-btn {
+            --c1: #4f46e5;
+            --c2: #7c3aed;
+            --soft: #f5f3ff;
+            --shadow: rgba(124, 58, 237, .30);
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 48px;
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 13.5px;
+            font-weight: 800;
+            letter-spacing: .2px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s ease, background .25s ease, color .25s ease;
+        }
+
+        /* Inactive tab: soft tinted glass */
+        .trade-tab {
+            color: var(--c1);
+            background: linear-gradient(135deg, #fff, var(--soft));
+            border: 1.5px solid color-mix(in srgb, var(--c1) 28%, white);
+            box-shadow: 0 4px 12px color-mix(in srgb, var(--c1) 12%, transparent);
+        }
+
+        .trade-tab[data-filter="recent"]     { --c1: #4f46e5; --c2: #9333ea; --soft: #eef2ff; --shadow: rgba(99, 102, 241, .38); }
+        .trade-tab[data-filter="profitable"] { --c1: #059669; --c2: #14b8a6; --soft: #ecfdf5; --shadow: rgba(16, 185, 129, .38); }
+        .trade-tab[data-filter="loss"]       { --c1: #e11d48; --c2: #f97316; --soft: #fff1f2; --shadow: rgba(244, 63, 94, .36); }
+
+        .trade-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px var(--shadow);
+            color: #fff;
+            background: linear-gradient(135deg, var(--c1), var(--c2));
+            border-color: transparent;
+        }
+
+        /* Active tab: full gradient with glow */
+        .trade-tab.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(135deg, var(--c1), var(--c2));
+            box-shadow: 0 10px 22px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .35);
+        }
+
+        /* Light sweep */
+        .trade-tab::after,
+        .add-trade-btn::after,
+        .back-btn::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: -80%;
+            width: 55%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .45), transparent);
+            transform: skewX(-18deg);
+            transition: left .7s ease;
+        }
+
+        .trade-tab:hover::after,
+        .add-trade-btn:hover::after,
+        .back-btn:hover::after {
+            left: 130%;
+        }
+
+        .trade-tab:active,
+        .add-trade-btn:active,
+        .back-btn:active {
+            transform: translateY(-1px) scale(.98);
+        }
+
+        .trade-tab:focus-visible,
+        .add-trade-btn:focus-visible,
+        .back-btn:focus-visible {
+            outline: 3px solid rgba(124, 58, 237, .45);
+            outline-offset: 2px;
+        }
+
+        .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 12px;
+            background: color-mix(in srgb, var(--c1) 14%, white);
+            color: var(--c1);
+            font-size: 11px;
+            font-weight: 800;
+            transition: .25s;
+        }
+
+        .trade-tab:hover .tab-count,
+        .trade-tab.active .tab-count {
+            background: rgba(255, 255, 255, .26);
+            color: #fff;
+        }
+
+        /* TradeZone: same size as tabs, gold-to-pink premium CTA */
+        .add-trade-btn {
+            --shadow: rgba(245, 158, 11, .42);
+            margin-left: auto;
+            border: none;
+            color: #fff;
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 45%, #ec4899 100%);
+            box-shadow: 0 10px 22px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .4);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, .22);
+        }
+
+        .add-trade-btn::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            background: radial-gradient(circle at 20% 0%, rgba(255, 255, 255, .35), transparent 55%);
+        }
+
+        .add-trade-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 30px rgba(236, 72, 153, .42), inset 0 1px 0 rgba(255, 255, 255, .45);
+        }
+
+        .trade-tabs .add-trade-btn {
+            margin-left: auto;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .trade-tab, .add-trade-btn, .back-btn { transition: none; }
+            .trade-tab::after, .add-trade-btn::after, .back-btn::after { display: none; }
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-wrapper {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            background: white;
+            border: 1px solid #e0e7ff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(79, 70, 229, .07);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .trade-header,
+        .trade-row {
+            display: grid;
+            grid-template-columns:
+                minmax(90px, 1.05fr)
+                minmax(95px, 1fr)
+                minmax(75px, .8fr)
+                minmax(105px, 1.1fr)
+                minmax(75px, .75fr)
+                minmax(95px, 1fr)
+                minmax(60px, .6fr)
+                minmax(95px, 1fr)
+                minmax(90px, .9fr)
+                minmax(105px, 1.1fr)
+                minmax(145px, 1.4fr);
+            gap: 7px;
+            align-items: center;
+            min-width: 1120px;
+            width: 100%;
+        }
+
+        .trade-header {
+            background: linear-gradient(135deg, #ede9fe, #fce7f3);
+            color: #5b21b6;
+            padding: 12px 10px;
+            border-bottom: 2px solid #c4b5fd;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .2px;
+        }
+
+        .trade-row {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eef2ff;
+            background: white;
+            font-size: 11px;
+            transition: background .2s ease;
+        }
+
+        .trade-row:last-child {
+            border-bottom: none;
+        }
+
+        .trade-row:hover {
+            background: #faf5ff;
+        }
+
+        .trade-cell {
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #312e81;
+            font-weight: 600;
+        }
+
+        .direction-buy,
+        .pnl-profit {
+            color: #059669 !important;
+        }
+
+        .direction-sell,
+        .pnl-loss {
+            color: #e11d48 !important;
+        }
+
+        .pnl-open,
+        .pnl-breakeven {
+            color: #64748b !important;
+        }
+
+        .pnl-profit,
+        .pnl-loss,
+        .pnl-breakeven {
+            font-weight: 800;
+        }
+
+        /* ================= LOADING / MESSAGES ================= */
+
+        .loading,
+        .message {
+            padding: 25px 15px;
+            text-align: center;
+            color: #64748b;
+            background: white;
+            font-size: 13px;
+        }
+
+        .error {
+            color: #be123c;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state {
+            padding: 30px 15px;
+            text-align: center;
+            color: #64748b;
+            background: white;
+            min-width: 1120px;
+            font-size: 13px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (min-width: 1500px) {
+            .trade-header,
+            .trade-row {
+                font-size: 12px;
+            }
+
+            .trade-header {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                padding: 18px 12px;
+            }
+
+            .trade-tabs {
+                gap: 7px;
+            }
+
+            .trade-tab,
+            .add-trade-btn {
+                padding: 11px 15px;
+            }
+
+            .trade-tabs .add-trade-btn {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 10px 12px;
+            }
+
+            .container {
+                padding: 15px 9px;
+            }
+
+            .page-heading h1 {
+                font-size: 20px;
+            }
+
+            .page-heading p {
+                font-size: 12px;
+            }
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 20px;
+            }
+
+            .back-btn {
+                padding: 9px 13px;
+                font-size: 12px;
+            }
+
+            .trade-tabs {
+                align-items: stretch;
+            }
+
+            .trade-tab,
+            .trade-tabs .add-trade-btn {
+                width: 100%;
+                justify-content: flex-start;
+                margin-left: 0;
+            }
+
+            .trade-tab .tab-count {
+                margin-left: auto;
+            }
+
+            .trade-header,
+            .trade-row {
+                min-width: 1120px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="logo">
+        <div class="logo-icon">
+            F
+            <div class="logo-leaf"></div>
+        </div>
+        <div>FIN<span>OVA</span></div>
+    </div>
+
+    <button class="back-btn"
+            type="button"
+            onclick="window.location.href='/customer/home'">
+        ← Dashboard
+    </button>
+
+</header>
+
+<main class="container">
+
+    <div class="page-heading">
+        <div>
+            <h1>📈 Trading Dashboard</h1>
+            <p>Review your recent trades, profits and losses.</p>
+        </div>
+    </div>
+
+    <!-- PREMIUM TRADING SUMMARY -->
+
+    <section class="summary-grid" aria-label="Trading summary">
+
+        <!-- TOTAL CAPITAL -->
+        <div class="summary-card capital-card">
+            <span class="ring"></span><span class="orb orb-1"></span><span class="orb orb-2"></span>
+            <div class="summary-top">
+                <div class="summary-label-wrap">
+                    <span class="summary-icon">💼</span>
+                    <div class="summary-label">Total Capital</div>
+                </div>
+                <span class="summary-tag">Portfolio</span>
+            </div>
+            <div class="summary-value" id="totalCapital">₹0.00</div>
+            <div class="summary-meta" id="capitalMeta"><span class="arrow">●</span><span>Funding ₹0.00</span></div>
+            <div class="summary-visual">
+                <svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="area" d="M0 32 C20 28 30 34 50 26 S85 22 105 24 S140 10 160 14 S190 6 200 4 L200 40 L0 40 Z"/>
+                    <path class="line" d="M0 32 C20 28 30 34 50 26 S85 22 105 24 S140 10 160 14 S190 6 200 4"/>
+                </svg>
+                <div class="summary-foot"><span class="summary-foot-dot"></span>Available trading capital</div>
+            </div>
+        </div>
+
+        <!-- TOTAL PROFIT -->
+        <div class="summary-card profit-card">
+            <span class="ring"></span><span class="orb orb-1"></span><span class="orb orb-2"></span>
+            <div class="summary-top">
+                <div class="summary-label-wrap">
+                    <span class="summary-icon">↗</span>
+                    <div class="summary-label">Total Profit</div>
+                </div>
+                <span class="summary-tag">Gains</span>
+            </div>
+            <div class="summary-value positive" id="totalProfit">₹0.00</div>
+            <div class="summary-meta up" id="profitMeta"><span class="arrow">▲</span><span>0 winning trades</span></div>
+            <div class="summary-visual">
+                <svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="area" d="M0 36 L25 30 L45 33 L70 22 L95 26 L120 14 L150 18 L175 8 L200 3 L200 40 L0 40 Z"/>
+                    <path class="line" d="M0 36 L25 30 L45 33 L70 22 L95 26 L120 14 L150 18 L175 8 L200 3"/>
+                </svg>
+                <div class="summary-foot"><span class="summary-foot-dot"></span>Profitable closed trades</div>
+            </div>
+        </div>
+
+        <!-- TOTAL LOSS -->
+        <div class="summary-card loss-card">
+            <span class="ring"></span><span class="orb orb-1"></span><span class="orb orb-2"></span>
+            <div class="summary-top">
+                <div class="summary-label-wrap">
+                    <span class="summary-icon">↘</span>
+                    <div class="summary-label">Total Loss</div>
+                </div>
+                <span class="summary-tag">Drawdown</span>
+            </div>
+            <div class="summary-value negative" id="totalLoss">₹0.00</div>
+            <div class="summary-meta down" id="lossMeta"><span class="arrow">▼</span><span>0 losing trades</span></div>
+            <div class="summary-visual">
+                <svg class="spark" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                    <path class="area" d="M0 4 L25 10 L50 7 L75 18 L100 14 L125 26 L150 22 L175 32 L200 36 L200 40 L0 40 Z"/>
+                    <path class="line" d="M0 4 L25 10 L50 7 L75 18 L100 14 L125 26 L150 22 L175 32 L200 36"/>
+                </svg>
+                <div class="summary-foot"><span class="summary-foot-dot"></span>Loss from closed trades</div>
+            </div>
+        </div>
+
+        <!-- NET P/L -->
+        <div class="summary-card net-card" id="netCard">
+            <span class="ring"></span><span class="orb orb-1"></span><span class="orb orb-2"></span>
+            <div class="summary-top">
+                <div class="summary-label-wrap">
+                    <span class="summary-icon">✦</span>
+                    <div class="summary-label">Net Profit / Loss</div>
+                </div>
+                <span class="summary-tag">Overall</span>
+            </div>
+            <div class="summary-value" id="netProfitLoss">₹0.00</div>
+            <div class="summary-meta" id="netMeta"><span class="arrow">●</span><span>No closed trades</span></div>
+            <div class="summary-visual">
+                <div class="progress-wrap">
+                    <div class="progress-track"><div class="progress-fill" id="winRateBar"></div></div>
+                    <span class="progress-text" id="winRateText">0% win rate</span>
+                </div>
+                <div class="summary-foot"><span class="summary-foot-dot"></span>Overall trading performance</div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- TRADE FILTERS -->
+
+    <div class="trade-tabs">
+
+        <button class="trade-tab active"
+                type="button"
+                data-filter="recent"
+                onclick="changeFilter('recent', this)">
+            📊 Recent Trades
+            <span class="tab-count" id="recentCount">0</span>
+        </button>
+
+        <button class="trade-tab"
+                type="button"
+                data-filter="profitable"
+                onclick="changeFilter('profitable', this)">
+            🟢 Profitable Trades
+            <span class="tab-count" id="profitableCount">0</span>
+        </button>
+
+        <button class="trade-tab"
+                type="button"
+                data-filter="loss"
+                onclick="changeFilter('loss', this)">
+            🔴 Loss-Making Trades
+            <span class="tab-count" id="lossCount">0</span>
+        </button>
+
+        <button class="add-trade-btn"
+                type="button"
+                onclick="window.location.href='/finova/api/v1/trading'">
+            + TradeZone
+        </button>
+
+    </div>
+
+    <div id="loadingMessage" class="loading">
+        Loading trades...
+    </div>
+
+    <div id="errorMessage"
+         class="message error"
+         style="display:none"></div>
+
+    <!-- TRADES TABLE -->
+
+    <div class="table-wrapper"
+         id="tableWrapper"
+         style="display:none">
+
+        <div class="trade-header">
+            <div>Symbol</div>
+            <div>Product Type</div>
+            <div>Market</div>
+            <div>Instrument Type</div>
+            <div>Direction</div>
+            <div>Entry Price</div>
+            <div>QTY</div>
+            <div>Exit Price</div>
+            <div>Brokerage</div>
+            <div>Profit/Loss</div>
+            <div>Date / Time</div>
+        </div>
+
+        <div id="tradesList"></div>
+
+    </div>
+
+</main>
+
+<script>
+
+    const API_URL = "/finova/api/v1/all/trades";
+    const CAPITAL_API_URL = "/finova/api/v1/trading/capital";
+
+    let allTrades = [];
+    let recentTrades = [];
+    let currentFilter = "recent";
+
+    // Net funding capital received from backend:
+    // Deposits - Withdrawals
+    let totalFundingCapital = 0;
+
+    document.addEventListener("DOMContentLoaded", loadRecentTrades);
+
+
+    /*
+     * Fetch Total Capital from backend.
+     *
+     * Backend response:
+     * {
+     *   "totalCapital": 5
+     * }
+     *
+     * Backend SQL already calculates:
+     * Deposits - Withdrawals
+     */
+    async function loadTradingCapital() {
+
+        try {
+
+            const response = await fetch(CAPITAL_API_URL, {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    "Unable to fetch trading capital: HTTP " + response.status
+                );
+            }
+
+            const responseData = await response.json();
+
+            console.log("Trading Capital API Response:", responseData);
+
+            // Read the exact field returned by your controller.
+            totalFundingCapital = Number(responseData.totalCapital) || 0;
+
+            console.log("Total Funding Capital:", totalFundingCapital);
+
+        } catch (error) {
+
+            console.error("Trading Capital API Error:", error);
+
+            totalFundingCapital = 0;
+
+            throw error;
+
+        }
+
+    }
+
+
+    /*
+     * Load ALL trades for summary calculations; display only the latest 10 trades.
+     */
+    async function loadRecentTrades() {
+
+        const loading = document.getElementById("loadingMessage");
+        const errorElement = document.getElementById("errorMessage");
+
+        loading.style.display = "block";
+        errorElement.style.display = "none";
+
+        try {
+
+            // Wait for both APIs to finish before calculating summary.
+            const [tradeResponse] = await Promise.all([
+
+                fetch(API_URL, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }),
+
+                loadTradingCapital()
+
+            ]);
+
+            if (!tradeResponse.ok) {
+                throw new Error(
+                    "Unable to load trades: HTTP " + tradeResponse.status
+                );
+            }
+
+            const trades = await tradeResponse.json();
+
+            if (!Array.isArray(trades)) {
+                throw new Error("Unexpected trades API response.");
+            }
+
+            // Keep every trade for summary calculations.
+            allTrades = trades;
+
+            // Display only the 10 most recent trades in the table and filters.
+            recentTrades = [...trades]
+                .sort((a, b) => getTradeTimestamp(b) - getTradeTimestamp(a))
+                .slice(0, 10);
+
+            updateCounts();
+
+            updateTradingSummary();
+
+            loading.style.display = "none";
+
+            renderFilteredTrades();
+
+        } catch (error) {
+
+            loading.style.display = "none";
+
+            errorElement.style.display = "block";
+
+            errorElement.textContent =
+                error.message || "Unable to load recent trades.";
+
+            console.error("Recent Trades Error:", error);
+
+        }
+
+    }
+
+
+    /*
+     * Animate a currency value from its current number to a new one.
+     */
+    function animateAmount(element, target) {
+
+        const reduceMotion = window.matchMedia &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const start = Number(element.dataset.value || 0);
+        element.dataset.value = target;
+
+        if (reduceMotion || start === target) {
+            element.textContent = formatAmount(target);
+            return;
+        }
+
+        const duration = 900;
+        const startTime = performance.now();
+
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            element.textContent = formatAmount(start + (target - start) * eased);
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                element.textContent = formatAmount(target);
+            }
+        }
+
+        requestAnimationFrame(step);
+
+    }
+
+
+    function setMeta(id, stateClass, arrow, text) {
+
+        const meta = document.getElementById(id);
+
+        meta.classList.remove("up", "down");
+
+        if (stateClass) {
+            meta.classList.add(stateClass);
+        }
+
+        meta.innerHTML =
+            `<span class="arrow">${arrow}</span><span>${escapeHtml(text)}</span>`;
+
+    }
+
+
+    function plural(count, word) {
+        return count + " " + word + (count === 1 ? "" : "s");
+    }
+
+
+    /*
+     * Calculate trading summary using ALL trades returned by /all/trades.
+     *
+     * Total Profit = Sum of positive P/L
+     * Total Loss = Sum of negative P/L (absolute value)
+     * Net P/L = Total Profit - Total Loss
+     *
+     * Total Capital =
+     * Backend Capital + Net P/L
+     *
+     * Backend Capital =
+     * Deposits - Withdrawals
+     */
+    function updateTradingSummary() {
+
+        let totalProfit = 0;
+        let totalLoss = 0;
+        let winCount = 0;
+        let lossCount = 0;
+        let closedCount = 0;
+
+        allTrades.forEach(trade => {
+
+            const pnl = calculateProfitLoss(trade);
+
+            if (pnl !== null) {
+
+                closedCount++;
+
+                if (pnl > 0) {
+
+                    totalProfit += pnl;
+                    winCount++;
+
+                } else if (pnl < 0) {
+
+                    totalLoss += Math.abs(pnl);
+                    lossCount++;
+
+                }
+
+            }
+
+        });
+
+        // Net Profit / Loss
+        const netProfitLoss = totalProfit - totalLoss;
+
+        // Backend has already deducted withdrawals.
+        const totalCapital = totalFundingCapital + netProfitLoss;
+
+        const winRate = closedCount > 0
+            ? Math.round((winCount / closedCount) * 100)
+            : 0;
+
+
+        // Total Profit
+        animateAmount(document.getElementById("totalProfit"), totalProfit);
+        setMeta("profitMeta", "up", "▲", plural(winCount, "winning trade"));
+
+
+        // Total Loss
+        animateAmount(document.getElementById("totalLoss"), totalLoss);
+        setMeta("lossMeta", "down", "▼", plural(lossCount, "losing trade"));
+
+
+        // Net Profit / Loss
+        const netElement = document.getElementById("netProfitLoss");
+        const netCard = document.getElementById("netCard");
+
+        animateAmount(netElement, netProfitLoss);
+
+        netElement.classList.remove("positive", "negative");
+        netCard.classList.remove("net-up", "net-down");
+
+        if (netProfitLoss > 0) {
+
+            netElement.classList.add("positive");
+            netCard.classList.add("net-up");
+            setMeta("netMeta", "up", "▲", "In profit · " + plural(closedCount, "closed trade"));
+
+        } else if (netProfitLoss < 0) {
+
+            netElement.classList.add("negative");
+            netCard.classList.add("net-down");
+            setMeta("netMeta", "down", "▼", "In loss · " + plural(closedCount, "closed trade"));
+
+        } else {
+
+            setMeta("netMeta", "", "●", closedCount > 0
+                ? "Break-even · " + plural(closedCount, "closed trade")
+                : "No closed trades");
+
+        }
+
+        // Win rate bar
+        document.getElementById("winRateText").textContent = winRate + "% win rate";
+
+        requestAnimationFrame(() => {
+            document.getElementById("winRateBar").style.width = winRate + "%";
+        });
+
+
+        // Total Capital
+        const capitalElement = document.getElementById("totalCapital");
+
+        animateAmount(capitalElement, totalCapital);
+
+        capitalElement.classList.remove("positive", "negative");
+
+        if (totalCapital > 0) {
+
+            capitalElement.classList.add("positive");
+
+        } else if (totalCapital < 0) {
+
+            capitalElement.classList.add("negative");
+
+        }
+
+        setMeta(
+            "capitalMeta",
+            netProfitLoss > 0 ? "up" : netProfitLoss < 0 ? "down" : "",
+            netProfitLoss > 0 ? "▲" : netProfitLoss < 0 ? "▼" : "●",
+            "Funding " + formatAmount(totalFundingCapital)
+        );
+
+
+        console.log("Trading Summary:", {
+            backendCapital: totalFundingCapital,
+            totalProfit,
+            totalLoss,
+            netProfitLoss,
+            totalCapital,
+            winRate
+        });
+
+    }
+
+
+    function changeFilter(filter, button) {
+
+        currentFilter = filter;
+
+        document.querySelectorAll(".trade-tab").forEach(tab => {
+            tab.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        renderFilteredTrades();
+
+    }
+
+
+    function updateCounts() {
+
+        document.getElementById("recentCount").textContent =
+            recentTrades.length;
+
+        document.getElementById("profitableCount").textContent =
+            recentTrades.filter(isProfitableTrade).length;
+
+        document.getElementById("lossCount").textContent =
+            recentTrades.filter(isLossMakingTrade).length;
+
+    }
+
+
+    /*
+     * Use saved netProfitLoss value when available.
+     * Otherwise calculate P/L for a closed trade.
+     */
+    function calculateProfitLoss(trade) {
+
+        const savedPnl = trade.netProfitLoss;
+
+        if (
+            savedPnl !== null &&
+            savedPnl !== undefined &&
+            String(savedPnl).trim() !== "" &&
+            Number.isFinite(Number(savedPnl))
+        ) {
+
+            return Number(savedPnl);
+
+        }
+
+
+        if (
+            trade.entryPrice === null ||
+            trade.entryPrice === undefined ||
+            trade.entryPrice === "" ||
+            trade.exitPrice === null ||
+            trade.exitPrice === undefined ||
+            trade.exitPrice === ""
+        ) {
+
+            return null;
+
+        }
+
+
+        const entry = Number(trade.entryPrice);
+        const exit = Number(trade.exitPrice);
+        const quantity = Number(trade.quantity ?? 1);
+        const multiplier = Number(trade.contractMultiplier ?? 1);
+        const brokerage = Number(trade.brokerage ?? 0);
+
+
+        if (
+            !Number.isFinite(entry) ||
+            !Number.isFinite(exit) ||
+            !Number.isFinite(quantity) ||
+            !Number.isFinite(multiplier) ||
+            !Number.isFinite(brokerage)
+        ) {
+
+            return null;
+
+        }
+
+
+        const direction = String(
+            trade.direction || ""
+        ).toUpperCase();
+
+        let priceDifference;
+
+
+        if (direction === "BUY" || direction === "LONG") {
+
+            priceDifference = exit - entry;
+
+        } else if (direction === "SELL" || direction === "SHORT") {
+
+            priceDifference = entry - exit;
+
+        } else {
+
+            return null;
+
+        }
+
+
+        return (priceDifference * quantity * multiplier) - brokerage;
+
+    }
+
+
+    function isProfitableTrade(trade) {
+
+        const pnl = calculateProfitLoss(trade);
+
+        return pnl !== null && pnl > 0;
+
+    }
+
+
+    function isLossMakingTrade(trade) {
+
+        const pnl = calculateProfitLoss(trade);
+
+        return pnl !== null && pnl < 0;
+
+    }
+
+
+    function renderFilteredTrades() {
+
+        const tableWrapper = document.getElementById("tableWrapper");
+        const tradesList = document.getElementById("tradesList");
+
+        let filteredTrades = recentTrades;
+
+        if (currentFilter === "profitable") {
+            filteredTrades = recentTrades.filter(isProfitableTrade);
+        } else if (currentFilter === "loss") {
+            filteredTrades = recentTrades.filter(isLossMakingTrade);
+        }
+
+
+        tableWrapper.style.display = "block";
+
+
+        if (filteredTrades.length === 0) {
+
+            let message = "No recent trades found.";
+
+            if (currentFilter === "profitable") {
+
+                message = "No profitable closed trades found.";
+
+            } else if (currentFilter === "loss") {
+
+                message = "No loss-making closed trades found.";
+
+            }
+
+
+            tradesList.innerHTML =
+                `<div class="empty-state">${escapeHtml(message)}</div>`;
+
+            return;
+
+        }
+
+
+        renderTrades(filteredTrades);
+
+    }
+
+
+    function renderTrades(trades) {
+
+        const tradesList = document.getElementById("tradesList");
+
+        tradesList.innerHTML = trades.map(trade => {
+
+            const pnl = calculateProfitLoss(trade);
+
+            const pnlText = pnl === null
+                ? "Open / N/A"
+                : formatAmount(pnl);
+
+
+            let pnlClass = "pnl-open";
+
+            if (pnl !== null && pnl > 0) {
+
+                pnlClass = "pnl-profit";
+
+            } else if (pnl !== null && pnl < 0) {
+
+                pnlClass = "pnl-loss";
+
+            } else if (pnl === 0) {
+
+                pnlClass = "pnl-breakeven";
+
+            }
+
+
+            const direction = String(
+                trade.direction ?? "-"
+            ).toUpperCase();
+
+
+            const directionClass =
+                direction === "BUY" || direction === "LONG"
+                    ? "direction-buy"
+                    : direction === "SELL" || direction === "SHORT"
+                        ? "direction-sell"
+                        : "";
+
+
+            const entryDateTime = getEntryDateTime(trade);
+
+
+            const cells = [
+
+                { value: trade.symbol },
+                { value: trade.productType },
+                { value: trade.market },
+                { value: trade.instrumentType },
+                { value: direction, className: directionClass },
+                { value: formatAmountOrDash(trade.entryPrice) },
+                { value: trade.quantity },
+                { value: formatAmountOrDash(trade.exitPrice) },
+                { value: formatAmountOrDash(trade.brokerage) },
+                { value: pnlText, className: pnlClass },
+                { value: formatDate(entryDateTime) }
+
+            ];
+
+
+            return `
+
+                <div class="trade-row">
+
+                    ${cells.map(cell => {
+
+                        const value =
+                            cell.value === null ||
+                            cell.value === undefined ||
+                            cell.value === ""
+                                ? "-"
+                                : String(cell.value);
+
+                        return `
+
+                            <div
+                                class="trade-cell ${cell.className || ""}"
+                                title="${escapeHtml(value)}">
+
+                                ${escapeHtml(value)}
+
+                            </div>
+
+                        `;
+
+                    }).join("")}
+
+                </div>
+
+            `;
+
+        }).join("");
+
+    }
+
+
+    // Convert the trade date to a timestamp so the newest trades appear first.
+    function getTradeTimestamp(trade) {
+
+        const value = getEntryDateTime(trade);
+
+        if (!value || value === "-") {
+            return 0;
+        }
+
+        const text = String(value).trim();
+
+        // Support dd-MM-yyyy date strings if the API returns that format.
+        const dmyMatch = /^(\d{2})-(\d{2})-(\d{4})/.exec(text);
+
+        if (dmyMatch) {
+            const parsed = new Date(
+                Number(dmyMatch[3]),
+                Number(dmyMatch[2]) - 1,
+                Number(dmyMatch[1])
+            );
+            return parsed.getTime();
+        }
+
+        const parsed = new Date(text.replace(" ", "T"));
+        return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+    }
+
+
+    function getEntryDateTime(trade) {
+
+        if (trade.entryDateTime) {
+
+            return trade.entryDateTime;
+
+        }
+
+        if (trade.entryDate && trade.entryTime) {
+
+            return `${trade.entryDate} ${trade.entryTime}`;
+
+        }
+
+        return trade.entryDate || trade.entryTime || "-";
+
+    }
+
+
+    function formatAmountOrDash(value) {
+
+        if (value === null || value === undefined || value === "") {
+
+            return "-";
+
+        }
+
+        return formatAmount(value);
+
+    }
+
+
+    function formatAmount(value) {
+
+        const amount = Number(value);
+
+        return Number.isFinite(amount)
+
+            ? "₹" + amount.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })
+
+            : String(value);
+
+    }
+
+
+    function formatDate(value) {
+
+        if (!value || value === "-") {
+
+            return "-";
+
+        }
+
+
+        const text = String(value).trim();
+
+
+        // Format yyyy-MM-dd without timezone conversion.
+        const dateOnlyMatch =
+            /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+
+
+        if (dateOnlyMatch) {
+
+            return `${dateOnlyMatch[3]}-${dateOnlyMatch[2]}-${dateOnlyMatch[1]}`;
+
+        }
+
+
+        // Format date/time values.
+        const normalizedText = text.replace(" ", "T");
+
+        const date = new Date(normalizedText);
+
+
+        if (Number.isNaN(date.getTime())) {
+
+            return text;
+
+        }
+
+
+        return date.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+    }
+
+
+    function escapeHtml(value) {
+
+        return String(value).replace(/[&<>"']/g, character => ({
+
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+
+        })[character]);
+
+    }
+
+</script>
+
+</body>
+</html>

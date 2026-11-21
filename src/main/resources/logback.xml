@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ========================================================= -->
+    <!-- Log File Location                                         -->
+    <!-- ========================================================= -->
+
+    <property name="DEV_HOME"
+              value="F:\kiran\Learning\STS_Workspace\logs\Finova" />
+
+
+    <!-- ========================================================= -->
+    <!-- Console Appender                                          -->
+    <!-- ========================================================= -->
+
+    <appender name="STDOUT"
+              class="ch.qos.logback.core.ConsoleAppender">
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+
+    </appender>
+
+
+    <!-- ========================================================= -->
+    <!-- Main Log File                                              -->
+    <!-- TRACE, DEBUG, INFO, WARN, ERROR                           -->
+    <!-- ========================================================= -->
+
+    <appender name="FILE-AUDIT"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <!-- Current log file -->
+        <file>${DEV_HOME}/expense.log</file>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+
+        <!-- Daily + Size Based Rolling -->
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+
+            <fileNamePattern>
+                ${DEV_HOME}/archived/expense.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+
+            <maxFileSize>10MB</maxFileSize>
+
+            <!-- Keep logs for 30 days -->
+            <maxHistory>30</maxHistory>
+
+            <!-- Optional total size limit -->
+            <totalSizeCap>1GB</totalSizeCap>
+
+        </rollingPolicy>
+
+    </appender>
+
+
+    <!-- ========================================================= -->
+    <!-- Error Log File                                             -->
+    <!-- ERROR only                                                 -->
+    <!-- ========================================================= -->
+
+    <appender name="FILE-ERROR"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <!-- Current error log -->
+        <file>${DEV_HOME}/expenseerror.log</file>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+
+        <!-- Daily + Size Based Rolling -->
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+
+            <fileNamePattern>
+                ${DEV_HOME}/archived/expenseerror.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+
+            <maxFileSize>10MB</maxFileSize>
+
+            <maxHistory>30</maxHistory>
+
+            <totalSizeCap>1GB</totalSizeCap>
+
+        </rollingPolicy>
+
+    </appender>
+
+
+    <!-- ========================================================= -->
+    <!-- Application Logger                                        -->
+    <!-- ========================================================= -->
+
+    <logger name="com.finance"
+            level="TRACE"
+            additivity="false">
+
+        <!-- TRACE and above -> Console -->
+        <appender-ref ref="STDOUT" />
+
+        <!-- TRACE and above -> expense.log -->
+        <appender-ref ref="FILE-AUDIT" />
+
+        <!-- ERROR and above -> expenseerror.log -->
+        <appender-ref ref="FILE-ERROR">
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+        </appender-ref>
+
+    </logger>
+
+
+    <!-- ========================================================= -->
+    <!-- Root Logger                                                -->
+    <!-- ========================================================= -->
+
+    <root level="ERROR">
+
+        <!-- Other libraries' ERROR logs -->
+        <appender-ref ref="FILE-ERROR" />
+
+        <appender-ref ref="STDOUT" />
+
+    </root>
+
+</configuration>

@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finova - Customer Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --ink: #1e1b4b;
+            --brand: linear-gradient(135deg, #4f46e5, #7c3aed 50%, #db2777);
+            --serif: 'Fraunces', Georgia, serif;
+            --sans: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--sans);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 24px;
+            background: linear-gradient(125deg, #3730a3 0%, #6d28d9 30%, #a21caf 62%, #db2777 85%, #f97316 120%);
+            background-size: 160% 160%;
+            animation: bgShift 16s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            to { background-position: 100% 60%; }
+        }
+
+        body::before {
+            content: "FINOVA";
+            position: fixed;
+            left: 50%;
+            top: 42%;
+            font-family: var(--serif);
+            font-size: clamp(80px, 15vw, 190px);
+            font-weight: 700;
+            letter-spacing: 20px;
+            color: rgba(255, 255, 255, 0.07);
+            transform: translate(-50%, -50%) rotate(-20deg);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 12s ease-in-out infinite alternate;
+        }
+
+        .orb.o1 { width: 380px; height: 380px; left: -100px; top: 60px; background: rgba(56, 189, 248, .35); }
+        .orb.o2 { width: 320px; height: 320px; right: -80px; top: 38%; background: rgba(250, 204, 21, .28); animation-delay: -4s; }
+        .orb.o3 { width: 360px; height: 360px; left: 30%; bottom: -150px; background: rgba(244, 114, 182, .4); animation-delay: -8s; }
+
+        @keyframes drift {
+            to { transform: translate(40px, -30px) scale(1.12); }
+        }
+
+        :focus-visible {
+            outline: 3px solid #a855f7;
+            outline-offset: 2px;
+        }
+
+        .shell {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 980px;
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 36px;
+            align-items: center;
+        }
+
+        /* PROMO PANEL */
+
+        .promo {
+            position: relative;
+            color: #fff;
+            padding: 10px 6px;
+        }
+
+        .promo .float {
+            position: absolute;
+            font-size: 34px;
+            filter: drop-shadow(0 8px 12px rgba(0, 0, 0, .3));
+            animation: floaty 5s ease-in-out infinite;
+        }
+
+        .promo .f1 { right: 8%; top: -14px; }
+        .promo .f2 { right: 28%; bottom: -26px; font-size: 28px; animation-delay: -2s; }
+
+        @keyframes floaty {
+            50% { transform: translateY(-10px) rotate(6deg); }
+        }
+
+        .promo-badge {
+            display: inline-block;
+            padding: 7px 16px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .2);
+            border: 1px solid rgba(255, 255, 255, .45);
+            font-size: 12px;
+            font-weight: 700;
+            backdrop-filter: blur(6px);
+            margin-bottom: 18px;
+        }
+
+        .promo h2 {
+            margin: 0;
+            font-family: var(--serif);
+            font-size: 46px;
+            line-height: 1.08;
+            text-shadow: 0 4px 24px rgba(0, 0, 0, .25);
+        }
+
+        .promo h2 em {
+            font-style: normal;
+            background: linear-gradient(90deg, #fde68a, #fbcfe8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .promo > p {
+            margin: 14px 0 26px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, .9);
+            max-width: 420px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            max-width: 440px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .35);
+            backdrop-filter: blur(10px);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.3;
+            transition: .25s;
+        }
+
+        .feature:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, .24);
+        }
+
+        .feature .ico {
+            flex: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(255, 255, 255, .25);
+        }
+
+        /* LOGIN CARD */
+
+        .login-container {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            justify-self: end;
+            padding: 40px 36px 34px;
+            background: #fff;
+            border-radius: 30px;
+            box-shadow: 0 30px 70px -15px rgba(30, 0, 70, .55), 0 0 0 1px rgba(255, 255, 255, .4);
+            text-align: left;
+            animation: cardIn .6s ease both;
+        }
+
+        .login-container::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 7px;
+            background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899, #f97316);
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(.97); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .finova-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 26px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 24px -6px rgba(124, 58, 237, .55);
+        }
+
+        .logo-f {
+            color: white;
+            font-family: var(--serif);
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .logo-leaf {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 19px;
+            height: 11px;
+            background: linear-gradient(135deg, #bbf7d0, #22c55e);
+            border-radius: 100% 0 100% 0;
+            transform: rotate(-25deg);
+        }
+
+        .logo-name {
+            font-family: var(--serif);
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #7c3aed, #db2777);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-name span {
+            color: #db2777;
+        }
+
+        .logo-tagline {
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: .8px;
+        }
+
+        .welcome {
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .welcome h1 {
+            margin: 0;
+            font-family: var(--serif);
+            font-size: 25px;
+            color: var(--ink);
+        }
+
+        .welcome p {
+            margin: 6px 0 0;
+            font-size: 13.5px;
+            color: #64748b;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .field {
+            position: relative;
+        }
+
+        .field .lead {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: linear-gradient(135deg, #ede9fe, #fce7f3);
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px 16px 15px 56px;
+            border: 1.5px solid #e5e7f5;
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #334155;
+            background: #f8f9ff;
+            outline: none;
+            transition: .2s;
+        }
+
+        input:hover {
+            border-color: #c4b5fd;
+        }
+
+        input:focus {
+            border-color: #7c3aed;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, .12);
+        }
+
+        input::placeholder {
+            color: #a8b0c4;
+        }
+
+        #password {
+            padding-right: 54px;
+        }
+
+        .eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 11px;
+            background: transparent;
+            font-size: 17px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .eye:hover {
+            background: #f5f3ff;
+        }
+
+        button.btn-login {
+            width: 100%;
+            padding: 16px;
+            margin-top: 26px;
+            border: none;
+            border-radius: 999px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: inherit;
+            color: white;
+            cursor: pointer;
+            background: var(--brand);
+            box-shadow: 0 14px 28px -6px rgba(124, 58, 237, .55);
+            transition: .3s;
+        }
+
+        button.btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 34px -6px rgba(219, 39, 119, .55);
+        }
+
+        button.btn-login:active {
+            transform: scale(.98);
+        }
+
+        button.btn-login:disabled {
+            opacity: .7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .secure-note {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed #e2e8f0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        /* Premium notification design */
+
+        .message {
+            display: none;
+            position: relative;
+            overflow: hidden;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            margin-top: 20px;
+            padding: 14px 15px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.5;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
+            animation: messageSlideIn 0.4s ease forwards;
+        }
+
+        .message.show {
+            display: flex;
+        }
+
+        .message.error {
+            color: #991b1b;
+            background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+            border: 1px solid #fecdd3;
+            border-left: 5px solid #ef4444;
+        }
+
+        .message.success {
+            color: #166534;
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #bbf7d0;
+            border-left: 5px solid #22c55e;
+        }
+
+        .message-icon {
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .message.error .message-icon {
+            background: linear-gradient(135deg, #e11d48, #f43f5e);
+        }
+
+        .message.success .message-icon {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-title {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .message-text {
+            font-size: 12px;
+            font-weight: 500;
+            opacity: 0.9;
+            overflow-wrap: anywhere;
+        }
+
+        .message-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.07);
+        }
+
+        .message-progress::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 100%;
+            transform-origin: left;
+            animation: progressCountdown 5s linear forwards;
+        }
+
+        .message.error .message-progress::after {
+            background: linear-gradient(90deg, #f43f5e, #f97316);
+        }
+
+        .message.success .message-progress::after {
+            background: linear-gradient(90deg, #22c55e, #14b8a6);
+        }
+
+        .message.hide {
+            animation: messageSlideOut 0.35s ease forwards;
+        }
+
+        @keyframes messageSlideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes messageSlideOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-8px); }
+        }
+
+        @keyframes progressCountdown {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+
+        @media (max-width: 900px) {
+            .shell {
+                grid-template-columns: 1fr;
+                max-width: 440px;
+            }
+
+            .promo {
+                display: none;
+            }
+
+            .login-container {
+                justify-self: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 32px 22px 26px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+    <div class="shell">
+
+        <!-- Promo panel (desktop only) -->
+
+        <aside class="promo">
+            <span class="float f1">💳</span><span class="float f2">🚀</span>
+
+            <div class="promo-badge">✨ Welcome to Finova</div>
+
+            <h2>Your money,<br><em>beautifully organised.</em></h2>
+
+            <p>Track expenses, plan goals, manage funds and journal your trades, all in one colourful place.</p>
+
+            <div class="features">
+                <div class="feature"><span class="ico">💸</span>Track every transaction</div>
+                <div class="feature"><span class="ico">🎯</span>Reach financial goals</div>
+                <div class="feature"><span class="ico">📈</span>Journal your trades</div>
+                <div class="feature"><span class="ico">📅</span>Plan important dates</div>
+            </div>
+        </aside>
+
+        <div class="login-container">
+
+            <div class="finova-brand">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <div class="logo-f">F</div>
+                        <div class="logo-leaf"></div>
+                    </div>
+
+                    <div class="logo-name">FIN<span>OVA</span></div>
+                </div>
+
+                <div class="logo-tagline">
+                    Smart Money. Better Future.
+                </div>
+            </div>
+
+            <div class="welcome">
+                <h1>👋 Welcome back</h1>
+                <p>Log in to continue to your dashboard</p>
+            </div>
+
+            <!-- Logout / Backend Flash Messages -->
+
+            <div th:if="${errorMessage}"
+                 id="serverErrorMessage"
+                 class="message error show"
+                 role="alert"
+                 aria-live="assertive">
+
+                <div class="message-icon">✕</div>
+
+                <div class="message-content">
+                    <span class="message-title">Login Unsuccessful</span>
+                    <div class="message-text" th:text="${errorMessage}"></div>
+                </div>
+
+                <div class="message-progress"></div>
+            </div>
+
+            <div th:if="${successMessage}"
+                 id="serverSuccessMessage"
+                 class="message success show"
+                 role="status"
+                 aria-live="polite">
+
+                <div class="message-icon">✓</div>
+
+                <div class="message-content">
+                    <span class="message-title">Success</span>
+                    <div class="message-text" th:text="${successMessage}"></div>
+                </div>
+
+                <div class="message-progress"></div>
+            </div>
+
+            <!-- Login Form -->
+
+            <form id="loginForm">
+
+                <label for="userName">👤 Username</label>
+
+                <div class="field">
+                    <span class="lead">👤</span>
+                    <input type="text"
+                           id="userName"
+                           name="userName"
+                           placeholder="Enter username"
+                           autocomplete="username"
+                           required>
+                </div>
+
+                <label for="password">🔑 Password</label>
+
+                <div class="field">
+                    <span class="lead">🔒</span>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           placeholder="Enter password"
+                           autocomplete="current-password"
+                           required>
+                    <button type="button" class="eye" id="togglePassword"
+                            aria-label="Show password" title="Show / hide password">👁️</button>
+                </div>
+
+                <button type="submit" id="loginButton" class="btn-login">
+                    Login
+                </button>
+
+            </form>
+
+            <!-- AJAX Login Messages -->
+
+            <div id="loginMessage"
+                 class="message"
+                 role="alert"
+                 aria-live="polite">
+            </div>
+
+            <div class="secure-note">🔒 Secured with encrypted login</div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const loginMessage = document.getElementById('loginMessage');
+
+        const serverErrorMessage = document.getElementById('serverErrorMessage');
+        const serverSuccessMessage = document.getElementById('serverSuccessMessage');
+
+        let messageTimeout;
+
+        // Premium AJAX notification
+
+        function showMessage(message, type) {
+
+            clearTimeout(messageTimeout);
+
+            loginMessage.className = 'message';
+
+            loginMessage.innerHTML = `
+                <div class="message-icon">
+                    ${type === 'success' ? '✓' : '✕'}
+                </div>
+
+                <div class="message-content">
+                    <span class="message-title">
+                        ${type === 'success' ? 'Success' : 'Login Failed'}
+                    </span>
+
+                    <div class="message-text"></div>
+                </div>
+
+                <div class="message-progress"></div>
+            `;
+
+            loginMessage.querySelector('.message-text').textContent = message;
+
+            loginMessage.classList.add(type, 'show');
+
+            messageTimeout = setTimeout(() => {
+                hideMessage(loginMessage);
+            }, 5000);
+        }
+
+        // Hide notification smoothly
+
+        function hideMessage(element) {
+
+            if (!element || !element.classList.contains('show')) {
+                return;
+            }
+
+            element.classList.add('hide');
+
+            setTimeout(() => {
+                element.className = 'message';
+                element.innerHTML = '';
+            }, 350);
+        }
+
+        // Backend messages automatically disappear after 5 seconds
+
+        function autoHideServerMessages() {
+
+            [serverErrorMessage, serverSuccessMessage].forEach(message => {
+
+                if (!message) {
+                    return;
+                }
+
+                setTimeout(() => {
+                    hideMessage(message);
+                }, 5000);
+
+            });
+        }
+
+        autoHideServerMessages();
+
+        // Hide previous backend notifications when user starts typing
+
+        function hideServerMessages() {
+
+            hideMessage(serverErrorMessage);
+            hideMessage(serverSuccessMessage);
+        }
+
+        document.getElementById('userName')
+            .addEventListener('input', hideServerMessages);
+
+        document.getElementById('password')
+            .addEventListener('input', hideServerMessages);
+
+        // Show / hide password
+
+        document.getElementById('togglePassword').addEventListener('click', function () {
+
+            const passwordInput = document.getElementById('password');
+            const isHidden = passwordInput.type === 'password';
+
+            passwordInput.type = isHidden ? 'text' : 'password';
+
+            this.textContent = isHidden ? '🙈' : '👁️';
+
+            this.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+        });
+
+        // Login API
+
+        loginForm.addEventListener('submit', async function (event) {
+
+            event.preventDefault();
+
+            const userName = document.getElementById('userName').value.trim();
+            const password = document.getElementById('password').value;
+
+            hideServerMessages();
+
+            if (!userName || !password) {
+
+                showMessage(
+                    'Please enter username and password.',
+                    'error'
+                );
+
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.textContent = 'Logging in...';
+
+            clearTimeout(messageTimeout);
+
+            loginMessage.className = 'message';
+            loginMessage.textContent = '';
+
+            try {
+
+                const response = await fetch('/customer/login', {
+
+                    method: 'POST',
+
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+
+                    credentials: 'same-origin',
+
+                    body: JSON.stringify({
+                        userName: userName,
+                        password: password
+                    })
+
+                });
+
+                const responseData = await response.json();
+
+                if (response.ok && responseData.RESP_STATUS === 'SUCCESS') {
+
+                    showMessage(
+                        responseData.INFORMATION || 'Login successful.',
+                        'success'
+                    );
+
+                    window.location.href = '/customer/home';
+
+                    return;
+                }
+
+                const errorMessage = responseData.REASON
+                    || responseData.INFORMATION
+                    || 'Invalid username or password.';
+
+                showMessage(errorMessage, 'error');
+
+            } catch (error) {
+
+                console.error('Customer login failed:', error);
+
+                showMessage(
+                    'Unable to connect to the server. Please try again.',
+                    'error'
+                );
+
+            } finally {
+
+                loginButton.disabled = false;
+                loginButton.textContent = 'Login';
+
+            }
+
+        });
+
+    </script>
+
+</body>
+</html>

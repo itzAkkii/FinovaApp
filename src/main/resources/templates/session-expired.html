@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FINOVA - Session Expired</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background:
+                radial-gradient(circle at top left, #e0e7ff, transparent 40%),
+                radial-gradient(circle at bottom right, #fce7f3, transparent 40%),
+                linear-gradient(135deg, #eef2ff, #fdf2f8, #ecfeff);
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 470px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .logo {
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            background: linear-gradient(
+                90deg,
+                #4f46e5,
+                #7c3aed,
+                #db2777
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 45px 35px;
+            border-radius: 25px;
+            box-shadow:
+                0 20px 60px rgba(79, 70, 229, 0.12),
+                0 5px 20px rgba(219, 39, 119, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .icon-circle {
+            width: 105px;
+            height: 105px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(
+                135deg,
+                #eef2ff,
+                #fce7f3
+            );
+            font-size: 48px;
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.12);
+        }
+
+        h1 {
+            color: #312e81;
+            font-size: 29px;
+            margin-bottom: 15px;
+            font-weight: 750;
+        }
+
+        .description {
+            color: #64748b;
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .warning {
+            padding: 15px;
+            border-radius: 12px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(
+                90deg,
+                #4f46e5,
+                #7c3aed,
+                #db2777
+            );
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(124, 58, 237, 0.35);
+        }
+
+        .footer {
+            margin-top: 25px;
+            color: #94a3b8;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 35px 22px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .logo {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <div class="logo">
+            FINOVA
+        </div>
+
+        <div class="card">
+
+            <div class="icon-circle">
+                🔒
+            </div>
+
+            <h1>Session Expired!</h1>
+
+            <p class="description">
+                Your session has expired due to inactivity
+                or a security timeout.
+                Please log in again to continue using
+                your FINOVA account.
+            </p>
+
+            <div class="warning">
+                ⚠️ For your account security, please log in
+                again to access your financial dashboard.
+            </div>
+
+            <a th:href="@{/customer/login}" class="login-btn">
+                🔐 Login Again
+            </a>
+
+        </div>
+
+        <div class="footer">
+            © 2026 FINOVA. All Rights Reserved.
+            <br><br>
+            Your Finance. Your Control. Your Future.
+        </div>
+
+    </div>
+
+    <script>
+
+        // Prevent returning to the expired page using browser Back button
+        window.history.replaceState(null, '', window.location.href);
+
+        window.addEventListener('popstate', function () {
+            window.history.replaceState(null, '', window.location.href);
+        });
+
+    </script>
+
+</body>
+</html>

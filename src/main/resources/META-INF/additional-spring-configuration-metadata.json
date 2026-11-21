@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "jasypt.encryptor.key",
+    "type": "java.lang.String",
+    "description": "A description for 'jasypt.encryptor.key'"
+  },
+  {
+    "name": "Environment",
+    "type": "java.lang.String",
+    "description": "A description for 'Environment'"
+  }
+]}

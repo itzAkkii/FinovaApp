@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finova - Financial Goals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b4b; --text:#475569; --muted:#94a3b8;
+  --c1:#6366f1; --c2:#a855f7; --c3:#ec4899; --c4:#f97316; --c5:#14b8a6; --c6:#0ea5e9; --c7:#22c55e;
+  --brand:linear-gradient(135deg,#4f46e5,#7c3aed 50%,#db2777);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--sans)}
+body{
+  min-height:100vh;color:var(--ink);
+  background:
+    radial-gradient(circle at 5% 10%,rgba(168,85,247,.16),transparent 28%),
+    radial-gradient(circle at 95% 8%,rgba(236,72,153,.14),transparent 26%),
+    radial-gradient(circle at 90% 85%,rgba(20,184,166,.14),transparent 28%),
+    radial-gradient(circle at 8% 90%,rgba(34,197,94,.12),transparent 26%),
+    linear-gradient(135deg,#faf9ff,#fff7fb,#f5fdfa);
+  background-attachment:fixed;
+}
+:focus-visible{outline:3px solid #a855f7;outline-offset:2px}
+
+/* HEADER */
+.topbar{position:sticky;top:0;z-index:50;height:72px;padding:0 44px;background:var(--brand);
+  display:flex;align-items:center;justify-content:space-between;color:#fff;box-shadow:0 8px 30px rgba(79,70,229,.3)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);
+  backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;position:relative}
+.logo-f{font-family:var(--serif);font-size:26px;font-weight:700}
+.logo-leaf{position:absolute;top:-4px;right:-3px;width:17px;height:11px;background:linear-gradient(135deg,#bbf7d0,#22c55e);
+  border-radius:100% 0 100% 0;transform:rotate(-25deg)}
+.topbar-brand{font-family:var(--serif);font-size:27px;font-weight:700;letter-spacing:1.5px}
+.topbar-brand span{color:#fbcfe8}
+.dashboard-btn{background:#fff;color:#6d28d9;padding:10px 20px;border-radius:999px;text-decoration:none;font-size:13px;
+  font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.15);transition:.25s}
+.dashboard-btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.22)}
+
+/* HERO */
+.container{width:90%;max-width:1100px;margin:38px auto 60px}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:38px 40px;margin-bottom:28px;color:#fff;
+  background:linear-gradient(120deg,#0f766e,#16a34a 35%,#4f46e5 70%,#db2777);box-shadow:0 24px 50px rgba(22,163,74,.28)}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%}
+.hero::before{width:260px;height:260px;right:-60px;top:-90px;background:rgba(255,255,255,.14)}
+.hero::after{width:170px;height:170px;right:150px;bottom:-90px;background:rgba(255,255,255,.10)}
+.hero-art{position:absolute;right:38px;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:92px;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.25));animation:floaty 5s ease-in-out infinite}
+@keyframes floaty{50%{transform:translateY(-58%) rotate(-2deg)}}
+.badge{display:inline-block;padding:7px 14px;margin-bottom:14px;border-radius:999px;background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
+.subtitle{margin-top:10px;max-width:480px;font-size:15px;line-height:1.6;color:rgba(255,255,255,.9);position:relative}
+
+/* TOOLBAR */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}
+.count{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#fff;
+  border:1px solid #bbf7d0;color:#15803d;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(22,163,74,.10)}
+.count::before{content:"";width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#14b8a6);box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+.create-btn{display:inline-block;background:linear-gradient(135deg,#059669,#16a34a 50%,#0d9488);color:#fff;padding:12px 22px;
+  border-radius:999px;text-decoration:none;font-size:13px;font-weight:700;transition:.25s;box-shadow:0 8px 20px rgba(22,163,74,.30)}
+.create-btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(13,148,136,.38)}
+
+/* GOAL GRID + CARD */
+.goal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.goal-card{--a:var(--c1);--b:var(--c2);--tint:#eef2ff;
+  position:relative;overflow:hidden;padding:26px;border-radius:26px;border:1.5px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,var(--a),var(--b)) border-box;
+  box-shadow:0 2px 4px rgba(30,27,75,.04),0 14px 28px -8px rgba(30,27,75,.12),0 30px 60px -20px color-mix(in srgb,var(--a) 35%,transparent);
+  transition:transform .25s,box-shadow .25s}
+.goal-card::after{content:"";position:absolute;left:0;right:0;top:0;height:90px;background:linear-gradient(180deg,var(--tint),transparent);pointer-events:none}
+.goal-card:hover{transform:translateY(-5px);
+  box-shadow:0 4px 8px rgba(30,27,75,.05),0 22px 40px -8px rgba(30,27,75,.16),0 40px 80px -20px color-mix(in srgb,var(--a) 45%,transparent)}
+.goal-card.t2{--a:var(--c5);--b:var(--c7);--tint:#ecfdf5}
+.goal-card.t3{--a:var(--c3);--b:var(--c4);--tint:#fff1f2}
+.goal-card.t4{--a:var(--c6);--b:var(--c1);--tint:#eff6ff}
+.goal-card.t5{--a:var(--c2);--b:var(--c3);--tint:#fdf4ff}
+.goal-card > *{position:relative;z-index:1}
+
+.goal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.goal-name{font-family:var(--serif);color:var(--ink);font-size:22px;font-weight:700;line-height:1.25}
+.priority{padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.priority-high{background:#fff1f2;color:#be123c;border-color:#fecdd3}
+.priority-medium{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.priority-low{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.goal-description{color:var(--text);font-size:14px;line-height:1.7;margin-bottom:20px}
+
+.goal-body{display:flex;align-items:center;gap:20px;padding:16px;border-radius:20px;
+  background:linear-gradient(135deg,#fcfcff,var(--tint));border:1px solid #f1f5f9}
+.ring{flex:none;position:relative;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--a),var(--b) calc(var(--p) * 1%),#e9e5ff 0);
+  box-shadow:0 10px 20px -6px color-mix(in srgb,var(--a) 50%,transparent)}
+.ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:#fff}
+.ring b{position:relative;font-family:var(--serif);font-size:22px;color:var(--ink)}
+.amounts{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.amount-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.amount-label{color:var(--muted);font-size:12px;font-weight:600}
+.amount-value{color:var(--ink);font-size:15px;font-weight:800}
+.amount-row.target .amount-value{color:var(--a)}
+
+.progress-container{width:100%;height:10px;margin-top:18px;background:#ede9fe;border-radius:999px;overflow:hidden}
+.progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--a),var(--b));
+  box-shadow:0 0 12px color-mix(in srgb,var(--a) 60%,transparent)}
+.progress-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.percentage{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--tint);
+  color:var(--ink);font-size:12px;font-weight:700}
+.percentage.done{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#78350f}
+.target-date{padding:6px 12px;border-radius:999px;background:#f8fafc;color:#64748b;font-size:12px;font-weight:600}
+
+/* STATES */
+.empty-state{grid-column:1/-1;background:#fff;padding:64px 30px;border-radius:28px;text-align:center;
+  border:2px dashed #bbf7d0;box-shadow:0 10px 30px rgba(22,163,74,.08)}
+.empty-icon{font-size:56px;margin-bottom:14px}
+.empty-state h2{font-family:var(--serif);color:var(--ink);font-size:26px;margin-bottom:8px}
+.empty-state p{color:#64748b;font-size:14px;margin:0 auto 22px;max-width:360px;line-height:1.7}
+.loading{grid-column:1/-1;text-align:center;padding:50px;color:#15803d;font-weight:700}
+.error-message{grid-column:1/-1;background:#fff1f2;color:#9f1239;padding:16px 18px;border-radius:14px;border-left:5px solid #e11d48;font-weight:600}
+
+@media (max-width:700px){
+  .topbar{padding:0 18px}
+  .topbar-brand{font-size:23px}
+  .container{width:94%;margin:26px auto 50px}
+  .hero{padding:30px 24px}
+  .hero-art{font-size:56px;right:18px;top:26px;transform:rotate(-8deg);animation:none}
+  h1{font-size:32px}
+  .goal-grid{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .count{justify-content:center}
+  .create-btn{text-align:center}
+  .goal-card{padding:22px 18px}
+}
+/* PREMIUM UPGRADE */
+.hero{background:
+  radial-gradient(circle at 78% 30%,rgba(253,224,71,.35),transparent 22%),
+  radial-gradient(circle at 90% 80%,rgba(244,114,182,.45),transparent 25%),
+  linear-gradient(120deg,#0f766e,#16a34a 32%,#4f46e5 68%,#be185d)}
+.hero h1{text-shadow:0 4px 20px rgba(0,0,0,.18)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
+.stats:empty{display:none}
+.stat{--a:var(--c1);--b:var(--c2);display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:22px;background:#fff;
+  border:1px solid #f1f5f9;box-shadow:0 10px 26px -8px rgba(30,27,75,.14);transition:.25s;animation:rise .6s both}
+.stat:hover{transform:translateY(-3px);box-shadow:0 16px 32px -8px rgba(30,27,75,.2)}
+.stat:nth-child(2){--a:var(--c5);--b:var(--c7)}
+.stat:nth-child(3){--a:var(--c4);--b:var(--c3)}
+.stat:nth-child(4){--a:var(--c6);--b:var(--c1)}
+.stat .ico{flex:none;width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;
+  background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 18px -6px color-mix(in srgb,var(--a) 60%,transparent)}
+.stat small{display:block;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.stat b{display:block;margin-top:2px;font-family:var(--serif);font-size:21px;color:var(--ink);line-height:1.2}
+
+.goal-card{animation:rise .6s both}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.goal-card::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;z-index:2;background:linear-gradient(90deg,var(--a),var(--b))}
+.goal-card:hover .ring{transform:scale(1.06) rotate(-4deg)}
+.ring{transition:.35s}
+.goal-name{background:linear-gradient(135deg,var(--ink),color-mix(in srgb,var(--a) 70%,var(--ink)));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.progress-container{position:relative;height:12px}
+.progress-container::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(90deg,transparent calc(25% - 1px),rgba(255,255,255,.9) 0 calc(25% + 1px),transparent 0),
+    linear-gradient(90deg,transparent calc(50% - 1px),rgba(255,255,255,.9) 0 calc(50% + 1px),transparent 0),
+    linear-gradient(90deg,transparent calc(75% - 1px),rgba(255,255,255,.9) 0 calc(75% + 1px),transparent 0)}
+.target-date.urgent{background:#fff7ed;color:#c2410c}
+.target-date.overdue{background:#fff1f2;color:#be123c}
+.target-date.ok{background:#ecfdf5;color:#047857}
+.goal-card.done{box-shadow:0 2px 4px rgba(30,27,75,.04),0 20px 40px -8px rgba(251,191,36,.45)}
+.goal-card.done .ring b{color:#b45309}
+
+@media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:420px){.stats{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+    <div class="logo">
+        <div class="logo-icon"><div class="logo-f">F</div><div class="logo-leaf"></div></div>
+        <div class="topbar-brand">FIN<span>OVA</span></div>
+    </div>
+    <a href="/finova/api/v1/journal" class="dashboard-btn">← Journal</a>
+</header>
+
+<!-- MAIN -->
+<div class="container">
+
+    <section class="hero">
+        <div class="hero-art">🎯</div>
+        <div class="badge">✨ Financial Planning</div>
+        <h1>My Financial Goals</h1>
+        <p class="subtitle">Track your financial targets, progress and target dates.</p>
+    </section>
+
+    <div id="goalStats" class="stats"></div>
+
+    <div class="toolbar">
+        <div id="goalCount" class="count">Loading goals...</div>
+        <a href="/finova/api/v1/journal?type=goal" class="create-btn">🎯 Create New Goal</a>
+    </div>
+
+    <div id="goalGrid" class="goal-grid">
+        <div class="loading">🎯 Loading your financial goals...</div>
+    </div>
+
+</div>
+
+<script>
+
+    /* ==================================================
+       LOAD GOALS
+    ================================================== */
+
+    function loadGoalList() {
+
+        const goalGrid = document.getElementById("goalGrid");
+        const goalCount = document.getElementById("goalCount");
+
+        fetch("/finova/api/v1/goal/list", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(async response => {
+
+            const data = await response.json();
+            console.log("Goal API Response:", data);
+
+            if (!response.ok) {
+                const reason = data.REASON || data.reason || "Unable to load financial goals.";
+                throw new Error(reason);
+            }
+
+            return data;
+        })
+        .then(data => {
+
+            console.log("Goal Response Object:", data);
+
+            const goalData = data.respMessage;
+
+            if (!goalData || !Array.isArray(goalData) || goalData.length === 0) {
+                showEmptyState();
+                goalCount.innerText = "0 financial goals";
+                return;
+            }
+
+            goalCount.innerText =
+                goalData.length + (goalData.length === 1 ? " financial goal" : " financial goals");
+
+            displayGoalList(goalData);
+        })
+        .catch(error => {
+
+            console.error("Goal Load Error:", error);
+
+            goalCount.innerText = "Unable to load goals";
+
+            goalGrid.innerHTML = `<div class="error-message">❌ ${escapeHtml(error.message)}</div>`;
+        });
+    }
+
+
+    /* ==================================================
+       DISPLAY GOALS
+    ================================================== */
+
+    function renderStats(list) {
+
+        let totalTarget = 0, totalSaved = 0, achieved = 0;
+
+        list.forEach(goal => {
+            const target = parseFloat(goal.targetAmount || 0);
+            const saved = parseFloat(goal.currentAmount || 0);
+            totalTarget += target;
+            totalSaved += saved;
+            if (target > 0 && saved >= target) { achieved++; }
+        });
+
+        const overall = totalTarget > 0 ? Math.min((totalSaved / totalTarget) * 100, 100) : 0;
+
+        document.getElementById("goalStats").innerHTML = `
+            <div class="stat"><span class="ico">🎯</span><div><small>Total Target</small><b>₹ ${formatAmount(totalTarget)}</b></div></div>
+            <div class="stat"><span class="ico">💰</span><div><small>Total Saved</small><b>₹ ${formatAmount(totalSaved)}</b></div></div>
+            <div class="stat"><span class="ico">📈</span><div><small>Overall Progress</small><b>${overall.toFixed(0)}%</b></div></div>
+            <div class="stat"><span class="ico">🏆</span><div><small>Goals Achieved</small><b>${achieved} / ${list.length}</b></div></div>
+        `;
+    }
+
+    function getDaysInfo(value, done) {
+
+        if (!value) {
+            return { text: "No target date", cls: "" };
+        }
+
+        const date = new Date(value);
+
+        if (isNaN(date.getTime())) {
+            return { text: value, cls: "" };
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        date.setHours(0, 0, 0, 0);
+
+        const days = Math.round((date - today) / 86400000);
+        const label = formatDate(value);
+
+        if (done) { return { text: label, cls: "ok" }; }
+        if (days < 0) { return { text: label + " · Overdue", cls: "overdue" }; }
+        if (days === 0) { return { text: label + " · Due today", cls: "urgent" }; }
+
+        return {
+            text: label + " · " + days + (days === 1 ? " day left" : " days left"),
+            cls: days <= 30 ? "urgent" : "ok"
+        };
+    }
+
+    function displayGoalList(goalListData) {
+
+        renderStats(goalListData);
+
+
+        const goalGrid = document.getElementById("goalGrid");
+
+        goalGrid.innerHTML = "";
+
+        goalListData.forEach((goal, index) => {
+
+            const goalName = goal.title || goal.goalName || "Untitled Goal";
+            const description = goal.subject || goal.description || "No description available.";
+            const targetAmount = parseFloat(goal.targetAmount || 0);
+            const currentAmount = parseFloat(goal.currentAmount || 0);
+
+            const percentage = targetAmount > 0
+                ? Math.min((currentAmount / targetAmount) * 100, 100)
+                : 0;
+
+            const priority = goal.priority || "MEDIUM";
+            const targetDate = goal.targetDate || "";
+
+            const priorityClass =
+                priority.toLowerCase() === "high" ? "priority-high"
+                : priority.toLowerCase() === "low" ? "priority-low"
+                : "priority-medium";
+
+            const priorityIcon =
+                priority.toLowerCase() === "high" ? "🔴"
+                : priority.toLowerCase() === "low" ? "🟢"
+                : "🟡";
+
+            const remaining = Math.max(targetAmount - currentAmount, 0);
+
+            const daysInfo = getDaysInfo(targetDate, percentage >= 100);
+
+            const card = document.createElement("div");
+
+            card.className = "goal-card t" + ((index % 5) + 1) + (percentage >= 100 ? " done" : "");
+            card.style.animationDelay = (index * 80) + "ms";
+
+            card.innerHTML = `
+
+                <div class="goal-header">
+                    <div class="goal-name">🎯 ${escapeHtml(goalName)}</div>
+                    <div class="priority ${priorityClass}">${priorityIcon} ${escapeHtml(priority)}</div>
+                </div>
+
+                <div class="goal-description">${escapeHtml(description)}</div>
+
+                <div class="goal-body">
+
+                    <div class="ring" style="--p:${percentage.toFixed(1)}">
+                        <b>${percentage.toFixed(0)}%</b>
+                    </div>
+
+                    <div class="amounts">
+                        <div class="amount-row">
+                            <span class="amount-label">Current Amount</span>
+                            <span class="amount-value">₹ ${formatAmount(currentAmount)}</span>
+                        </div>
+                        <div class="amount-row target">
+                            <span class="amount-label">Target Amount</span>
+                            <span class="amount-value">₹ ${formatAmount(targetAmount)}</span>
+                        </div>
+                        <div class="amount-row">
+                            <span class="amount-label">Still to go</span>
+                            <span class="amount-value">₹ ${formatAmount(remaining)}</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar" style="width:${percentage}%"></div>
+                </div>
+
+                <div class="progress-footer">
+                    <span class="percentage ${percentage >= 100 ? "done" : ""}">
+                        ${percentage >= 100 ? "🏆 Goal Achieved" : percentage.toFixed(0) + "% Completed"}
+                    </span>
+
+                    <span class="target-date ${daysInfo.cls}">
+                        📅 ${escapeHtml(daysInfo.text)}
+                    </span>
+                </div>
+
+            `;
+
+            goalGrid.appendChild(card);
+        });
+    }
+
+
+    /* ==================================================
+       EMPTY STATE
+    ================================================== */
+
+    function showEmptyState() {
+
+        const goalGrid = document.getElementById("goalGrid");
+
+        goalGrid.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-icon">🎯</div>
+
+                <h2>No Financial Goals Yet</h2>
+
+                <p>Create your first financial goal and start tracking your progress.</p>
+
+                <a href="/finova/api/v1/journal?type=goal" class="create-btn">
+                    🎯 Create Your First Goal
+                </a>
+
+            </div>
+
+        `;
+    }
+
+
+    /* ==================================================
+       FORMAT AMOUNT
+    ================================================== */
+
+    function formatAmount(amount) {
+
+        return Number(amount || 0).toLocaleString(
+            "en-IN",
+            { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        );
+    }
+
+
+    /* ==================================================
+       FORMAT DATE
+    ================================================== */
+
+    function formatDate(value) {
+
+        if (!value) {
+            return "";
+        }
+
+        try {
+
+            const date = new Date(value);
+
+            if (isNaN(date.getTime())) {
+                return value;
+            }
+
+            return date.toLocaleDateString(
+                "en-IN",
+                { day: "2-digit", month: "short", year: "numeric" }
+            );
+
+        } catch (error) {
+            return value;
+        }
+    }
+
+
+    /* ==================================================
+       HTML ESCAPE
+    ================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /* ==================================================
+       INITIAL LOAD
+    ================================================== */
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+        loadGoalList();
+
+    });
+
+</script>
+
+</body>
+</html>

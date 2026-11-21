@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finova - My Diary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b4b; --text:#475569; --muted:#94a3b8;
+  --c1:#6366f1; --c2:#a855f7; --c3:#ec4899; --c4:#f97316; --c5:#14b8a6; --c6:#0ea5e9;
+  --brand:linear-gradient(135deg,#4f46e5,#7c3aed 50%,#db2777);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--sans)}
+body{
+  min-height:100vh;color:var(--ink);
+  background:
+    radial-gradient(circle at 5% 10%,rgba(168,85,247,.16),transparent 28%),
+    radial-gradient(circle at 95% 8%,rgba(236,72,153,.14),transparent 26%),
+    radial-gradient(circle at 90% 85%,rgba(20,184,166,.12),transparent 28%),
+    radial-gradient(circle at 8% 90%,rgba(249,115,22,.10),transparent 26%),
+    linear-gradient(135deg,#faf9ff,#fff7fb,#f5fdfa);
+  background-attachment:fixed;
+}
+:focus-visible{outline:3px solid #a855f7;outline-offset:2px}
+
+/* HEADER */
+.topbar{position:sticky;top:0;z-index:50;height:72px;padding:0 44px;background:var(--brand);
+  display:flex;align-items:center;justify-content:space-between;color:#fff;
+  box-shadow:0 8px 30px rgba(79,70,229,.3)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;position:relative}
+.logo-f{font-family:var(--serif);font-size:26px;font-weight:700}
+.logo-leaf{position:absolute;top:-4px;right:-3px;width:17px;height:11px;
+  background:linear-gradient(135deg,#bbf7d0,#22c55e);border-radius:100% 0 100% 0;transform:rotate(-25deg)}
+.topbar-brand{font-family:var(--serif);font-size:27px;font-weight:700;letter-spacing:1.5px}
+.topbar-brand span{color:#fbcfe8}
+.dashboard-btn{background:#fff;color:#6d28d9;padding:10px 20px;border-radius:999px;text-decoration:none;
+  font-size:13px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.15);transition:.25s}
+.dashboard-btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.22)}
+
+/* CONTAINER + HERO */
+.container{width:90%;max-width:1000px;margin:38px auto 60px}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:38px 40px;margin-bottom:28px;color:#fff;
+  background:linear-gradient(120deg,#4338ca,#7c3aed 45%,#db2777 80%,#f97316);
+  box-shadow:0 24px 50px rgba(124,58,237,.30)}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(2px)}
+.hero::before{width:260px;height:260px;right:-60px;top:-90px;background:rgba(255,255,255,.14)}
+.hero::after{width:170px;height:170px;right:150px;bottom:-90px;background:rgba(255,255,255,.10)}
+.hero-art{position:absolute;right:38px;top:50%;transform:translateY(-50%) rotate(8deg);font-size:92px;
+  opacity:.9;filter:drop-shadow(0 12px 18px rgba(0,0,0,.25));animation:floaty 5s ease-in-out infinite}
+@keyframes floaty{50%{transform:translateY(-58%) rotate(2deg)}}
+.badge{display:inline-block;padding:7px 14px;margin-bottom:14px;border-radius:999px;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);
+  font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
+.subtitle{margin-top:10px;max-width:480px;font-size:15px;line-height:1.6;color:rgba(255,255,255,.9);position:relative}
+
+/* TOOLBAR */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}
+.count{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:#fff;
+  border:1px solid #e9d5ff;color:#6d28d9;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(124,58,237,.10)}
+.count::before{content:"";width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,#22c55e,#14b8a6);
+  box-shadow:0 0 0 4px rgba(34,197,94,.18)}
+.write-btn{display:inline-block;background:var(--brand);color:#fff;padding:12px 22px;border-radius:999px;
+  text-decoration:none;font-size:13px;font-weight:700;transition:.25s;box-shadow:0 8px 20px rgba(124,58,237,.28)}
+.write-btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(219,39,119,.32)}
+
+/* DIARY LIST */
+.diary-list{display:flex;flex-direction:column;gap:20px}
+.diary-item{--a:var(--c1);--b:var(--c2);--tint:#eef2ff;
+  position:relative;overflow:hidden;background:#fff;border-radius:22px;padding:26px 28px 20px 34px;
+  border:1px solid #f1f5f9;box-shadow:0 10px 30px rgba(30,27,75,.07);
+  transition:transform .25s,box-shadow .25s,opacity .35s}
+.diary-item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(180deg,var(--a),var(--b))}
+.diary-item::after{content:"";position:absolute;right:-50px;top:-50px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,var(--tint),transparent 70%);pointer-events:none}
+.diary-item:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(30,27,75,.13)}
+.diary-item.t2{--a:var(--c2);--b:var(--c3);--tint:#fdf2f8}
+.diary-item.t3{--a:var(--c4);--b:var(--c3);--tint:#fff7ed}
+.diary-item.t4{--a:var(--c5);--b:var(--c6);--tint:#ecfeff}
+.diary-item.t5{--a:var(--c6);--b:var(--c1);--tint:#eff6ff}
+.diary-item.deleting{opacity:0;transform:translateX(40px) scale(.97)}
+
+.diary-header{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:12px;position:relative}
+.diary-title{font-family:var(--serif);color:var(--ink);font-size:22px;font-weight:700;line-height:1.25}
+.diary-date{color:#fff;background:linear-gradient(135deg,var(--a),var(--b));padding:7px 13px;border-radius:999px;
+  font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 5px 12px rgba(30,27,75,.15)}
+.diary-subject{color:var(--text);font-size:14.5px;line-height:1.8;white-space:pre-wrap;position:relative;max-width:76ch}
+
+.diary-footer{margin-top:18px;padding-top:14px;border-top:1px dashed #e2e8f0;display:flex;
+  justify-content:space-between;align-items:center;gap:15px;position:relative}
+.diary-info{display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:11px;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;background:var(--tint);
+  color:var(--ink);font-size:11px;font-weight:700}
+.chip.plain{background:#f8fafc;color:#64748b;font-weight:600}
+
+/* DELETE BUTTON */
+.delete-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 14px 0 6px;
+  border:1px solid #fecdd3;border-radius:999px;background:#fff7f8;color:#be123c;font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:.25s}
+.delete-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;
+  background:linear-gradient(135deg,#ffe4e6,#fecdd3);font-size:13px;transition:.25s}
+.delete-btn:hover{background:linear-gradient(135deg,#f43f5e,#be123c);color:#fff;border-color:transparent;
+  transform:translateY(-2px);box-shadow:0 8px 18px rgba(190,24,93,.28)}
+.delete-btn:hover .delete-icon{background:rgba(255,255,255,.25);transform:rotate(-12deg) scale(1.08)}
+.delete-btn:active{transform:scale(.96)}
+.delete-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* STATES */
+.loading{text-align:center;padding:50px;color:#7c3aed;font-weight:700}
+.error-message{background:#fff1f2;color:#9f1239;padding:16px 18px;border-radius:14px;border-left:5px solid #e11d48;font-weight:600}
+.empty-state{background:#fff;padding:64px 30px;border-radius:26px;text-align:center;
+  border:2px dashed #e9d5ff;box-shadow:0 10px 30px rgba(124,58,237,.08)}
+.empty-icon{font-size:56px;margin-bottom:14px}
+.empty-state h2{font-family:var(--serif);color:var(--ink);font-size:26px;margin-bottom:8px}
+.empty-state p{color:#64748b;font-size:14px;margin:0 auto 22px;max-width:360px;line-height:1.7}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(30,27,75,.55);backdrop-filter:blur(6px);display:flex;
+  align-items:center;justify-content:center;z-index:9999;opacity:0;visibility:hidden;transition:.25s;padding:20px}
+.modal-overlay.show{opacity:1;visibility:visible}
+.confirm-modal{width:100%;max-width:400px;background:#fff;border-radius:26px;padding:32px 28px;text-align:center;
+  box-shadow:0 30px 70px rgba(0,0,0,.3);transform:translateY(16px) scale(.96);transition:.25s;position:relative;overflow:hidden}
+.confirm-modal::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:linear-gradient(90deg,#f43f5e,#f97316,#ec4899)}
+.modal-overlay.show .confirm-modal{transform:none}
+.modal-icon{width:70px;height:70px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+  border-radius:24px;background:linear-gradient(135deg,#fff1f2,#fecdd3);font-size:32px;box-shadow:0 8px 20px rgba(190,24,93,.15)}
+.confirm-modal h2{font-family:var(--serif);color:var(--ink);font-size:23px;margin-bottom:10px}
+.confirm-modal p{color:#64748b;font-size:13.5px;line-height:1.7;margin-bottom:24px}
+.modal-actions{display:flex;gap:12px}
+.modal-btn{flex:1;padding:13px 10px;border-radius:999px;border:none;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.cancel-btn{background:#f1f5f9;color:#475569}
+.cancel-btn:hover{background:#e2e8f0}
+.confirm-delete-btn{background:linear-gradient(135deg,#f43f5e,#be123c);color:#fff;box-shadow:0 8px 18px rgba(190,18,60,.28)}
+.confirm-delete-btn:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(190,18,60,.35)}
+.modal-btn:disabled{opacity:.6;cursor:not-allowed}
+
+/* TOAST */
+.toast-container{position:fixed;top:92px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:10px}
+.toast{min-width:280px;max-width:360px;display:flex;align-items:center;gap:12px;padding:15px 18px;border-radius:16px;
+  background:#fff;box-shadow:0 14px 34px rgba(30,27,75,.18);border:1px solid #e2e8f0;animation:toastIn .3s ease}
+.toast.success{border-left:5px solid #16a34a}
+.toast.error{border-left:5px solid #dc2626}
+.toast-icon{font-size:21px}
+.toast-message{color:#334155;font-size:13px;font-weight:600;line-height:1.5}
+.toast.hide{animation:toastOut .3s ease forwards}
+@keyframes toastIn{from{opacity:0;transform:translateX(25px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(25px)}}
+
+@media (max-width:700px){
+  .topbar{padding:0 18px}
+  .topbar-brand{font-size:23px}
+  .container{width:94%;margin:26px auto 50px}
+  .hero{padding:30px 24px}
+  .hero-art{font-size:56px;right:18px;top:26px;transform:rotate(8deg);animation:none}
+  h1{font-size:32px}
+  .subtitle{max-width:none}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .count{justify-content:center}
+  .write-btn{text-align:center}
+  .diary-item{padding:22px 20px 18px 28px}
+  .diary-header{flex-direction:column}
+  .diary-footer{flex-direction:column;align-items:flex-start}
+  .delete-btn{align-self:flex-end}
+  .toast-container{left:15px;right:15px;top:84px}
+  .toast{min-width:0;max-width:none;width:100%}
+}
+/* PREMIUM DIARY CARD */
+.diary-item{padding:28px 30px 22px;border:1.5px solid transparent;border-radius:26px;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,var(--a),var(--b)) border-box;
+  box-shadow:0 2px 4px rgba(30,27,75,.04),0 14px 28px -8px rgba(30,27,75,.12),0 30px 60px -20px color-mix(in srgb,var(--a) 35%,transparent)}
+.diary-item::before{content:"\201C";left:auto;top:6px;right:26px;bottom:auto;width:auto;background:none;
+  font-family:var(--serif);font-size:120px;line-height:1;font-weight:700;
+  background:linear-gradient(135deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;
+  color:transparent;opacity:.13;pointer-events:none}
+.diary-item::after{left:0;right:0;top:0;bottom:auto;width:auto;height:90px;border-radius:0;
+  background:linear-gradient(180deg,var(--tint),transparent)}
+.diary-item:hover{transform:translateY(-5px);
+  box-shadow:0 4px 8px rgba(30,27,75,.05),0 22px 40px -8px rgba(30,27,75,.16),0 40px 80px -20px color-mix(in srgb,var(--a) 45%,transparent)}
+.diary-header{align-items:center;justify-content:flex-start;gap:18px;margin-bottom:16px;padding-right:50px}
+.date-tile{flex:none;width:68px;border-radius:18px;overflow:hidden;text-align:center;color:#fff;
+  background:linear-gradient(160deg,var(--a),var(--b));box-shadow:0 10px 20px -6px color-mix(in srgb,var(--a) 60%,transparent),inset 0 1px 0 rgba(255,255,255,.4)}
+.date-tile span{display:block;padding:5px 0 2px;font-size:11px;font-weight:700;letter-spacing:1px;background:rgba(0,0,0,.14)}
+.date-tile b{display:block;padding-top:8px;font-family:var(--serif);font-size:30px;line-height:1}
+.date-tile i{display:block;padding:2px 0 7px;font-style:normal;font-size:10px;font-weight:600;opacity:.85}
+.diary-heading{min-width:0}
+.diary-title{font-size:23px;letter-spacing:-.2px;margin-bottom:8px}
+.diary-meta{display:flex;flex-wrap:wrap;gap:8px}
+.diary-subject{font-size:15px;line-height:1.85;padding:16px 18px;border-radius:16px;
+  background:linear-gradient(135deg,#fcfcff,var(--tint));border:1px solid #f1f5f9;color:#475569}
+.diary-footer{border-top:none;padding-top:0;margin-top:16px}
+.chip{border:1px solid color-mix(in srgb,var(--a) 22%,transparent)}
+@media (max-width:700px){
+  .diary-item{padding:22px 20px 18px}
+  .diary-header{flex-direction:row;padding-right:0;gap:14px}
+  .date-tile{width:58px}
+  .diary-title{font-size:20px}
+  .diary-footer{flex-direction:row;align-items:center}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon"><div class="logo-f">F</div><div class="logo-leaf"></div></div>
+    <div class="topbar-brand">FIN<span>OVA</span></div>
+  </div>
+  <a href="/finova/api/v1/journal" class="dashboard-btn">← Journal</a>
+</header>
+
+<div class="container">
+
+  <section class="hero">
+    <div class="hero-art">📖</div>
+    <div class="badge">✨ My Personal Diary</div>
+    <h1>My Diary</h1>
+    <p class="subtitle">Your saved thoughts, financial activities and learnings, all in one place.</p>
+  </section>
+
+  <div class="toolbar">
+    <div id="diaryCount" class="count">Loading diary entries...</div>
+    <a href="/finova/api/v1/journal" class="write-btn">✍️ Write New Diary</a>
+  </div>
+
+  <div id="diaryList" class="diary-list">
+    <div class="loading">📖 Loading your diary...</div>
+  </div>
+
+</div>
+
+<!-- DELETE CONFIRMATION -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="confirm-modal">
+    <div class="modal-icon">🗑️</div>
+    <h2>Delete Diary Entry?</h2>
+    <p>Are you sure you want to delete this diary entry? This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn cancel-btn" id="cancelDelete">Cancel</button>
+      <button type="button" class="modal-btn confirm-delete-btn" id="confirmDelete">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+
+/* GLOBAL VARIABLES */
+let selectedNoteId = null;
+let selectedDeleteButton = null;
+
+/* LOAD DIARY LIST */
+function loadDiaryList() {
+
+  const diaryList = document.getElementById("diaryList");
+  const diaryCount = document.getElementById("diaryCount");
+
+  fetch("/finova/api/v1/diary/list", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(async response => {
+
+    const data = await response.json();
+    console.log("Diary API Response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.REASON || data.reason || data.INFORMATION || "Unable to load diary entries.");
+    }
+
+    if (data.RESP_STATUS && data.RESP_STATUS.toString().toUpperCase() === "FAIL") {
+      throw new Error(data.REASON || data.reason || data.INFORMATION || "Unable to load diary entries.");
+    }
+
+    return data;
+  })
+  .then(data => {
+
+    const diaryData = data.respMessage;
+
+    if (!diaryData || !Array.isArray(diaryData)) {
+      showEmptyState();
+      diaryCount.innerText = "0 diary entries";
+      return;
+    }
+
+    // Display only active diary entries (flag = Y)
+    const activeDiaryData = diaryData.filter(diary =>
+      String(diary.flag || "").trim().toUpperCase() === "Y"
+    );
+
+    if (activeDiaryData.length === 0) {
+      showEmptyState();
+      diaryCount.innerText = "0 diary entries";
+      return;
+    }
+
+    diaryCount.innerText =
+      activeDiaryData.length + (activeDiaryData.length === 1 ? " diary entry" : " diary entries");
+
+    displayDiaryList(activeDiaryData);
+  })
+  .catch(error => {
+    console.error("Diary Load Error:", error);
+    diaryCount.innerText = "Unable to load diary";
+    diaryList.innerHTML = `<div class="error-message">❌ ${escapeHtml(error.message)}</div>`;
+  });
+}
+
+/* DISPLAY DIARY */
+function displayDiaryList(diaryListData) {
+
+  const diaryList = document.getElementById("diaryList");
+  diaryList.innerHTML = "";
+
+  diaryListData.forEach((diary, index) => {
+
+    const noteId = diary.noteId || "";
+    const title = diary.noteTitle || "Untitled Diary";
+    const subject = diary.diary || "No diary content available.";
+    const dateValue = diary.Date || diary.date || "";
+    const date = formatDate(dateValue);
+    const dateAndTime = diary.dateAndTime || "";
+    const category = diary.category || "";
+
+    const dp = date ? date.split(" ") : [];
+
+    const item = document.createElement("div");
+    item.className = "diary-item t" + ((index % 5) + 1);
+    item.dataset.noteId = noteId;
+
+    item.innerHTML = `
+      <div class="diary-header">
+        ${dp.length === 3
+          ? `<div class="date-tile"><span>${escapeHtml(dp[1].toUpperCase())}</span><b>${escapeHtml(dp[0])}</b><i>${escapeHtml(dp[2])}</i></div>`
+          : (date ? `<div class="diary-date">📅 ${escapeHtml(date)}</div>` : "")}
+        <div class="diary-heading">
+          <div class="diary-title">${escapeHtml(title)}</div>
+          <div class="diary-meta">
+            ${category ? `<span class="chip">🏷️ ${escapeHtml(category)}</span>` : ""}
+            ${dateAndTime ? `<span class="chip plain">🕒 ${escapeHtml(dateAndTime)}</span>` : ""}
+          </div>
+        </div>
+      </div>
+
+      <div class="diary-subject">${escapeHtml(subject)}</div>
+
+      <div class="diary-footer">
+        <div class="diary-info">
+          ${noteId
+            ? `<span class="chip plain">ID: ${escapeHtml(noteId)}</span>`
+            : `<span class="chip plain">📖 Finova Personal Journal</span>`}
+        </div>
+
+        ${noteId ? `
+          <button type="button" class="delete-btn">
+            <span class="delete-icon">🗑️</span>
+            <span>Delete</span>
+          </button>` : ""}
+      </div>
+    `;
+
+    const deleteButton = item.querySelector(".delete-btn");
+
+    if (deleteButton) {
+      deleteButton.addEventListener("click", function() {
+        openDeleteModal(noteId, deleteButton);
+      });
+    }
+
+    diaryList.appendChild(item);
+  });
+}
+
+/* OPEN / CLOSE DELETE MODAL */
+function openDeleteModal(noteId, button) {
+
+  if (!noteId) {
+    showToast("Unable to delete diary. Note ID is missing.", "error");
+    return;
+  }
+
+  selectedNoteId = noteId;
+  selectedDeleteButton = button;
+  document.getElementById("deleteModal").classList.add("show");
+}
+
+function closeDeleteModal() {
+  document.getElementById("deleteModal").classList.remove("show");
+  selectedNoteId = null;
+  selectedDeleteButton = null;
+}
+
+document.getElementById("cancelDelete").addEventListener("click", closeDeleteModal);
+
+document.getElementById("confirmDelete").addEventListener("click", function() {
+
+  if (!selectedNoteId || !selectedDeleteButton) {
+    return;
+  }
+
+  const noteId = selectedNoteId;
+  const button = selectedDeleteButton;
+
+  closeDeleteModal();
+  deleteDiary(noteId, button);
+});
+
+document.getElementById("deleteModal").addEventListener("click", function(event) {
+  if (event.target === this) {
+    closeDeleteModal();
+  }
+});
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Escape") {
+    closeDeleteModal();
+  }
+});
+
+/* DELETE DIARY API */
+async function deleteDiary(noteId, button) {
+
+  if (!noteId) {
+    return;
+  }
+
+  const diaryItem = button.closest(".diary-item");
+  const originalButtonHTML = button.innerHTML;
+  const confirmButton = document.getElementById("confirmDelete");
+
+  try {
+
+    button.disabled = true;
+    button.innerHTML = `<span>⏳</span><span>Deleting...</span>`;
+    confirmButton.disabled = true;
+
+    const response = await fetch("/finova/api/v1/diary/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ noteId: noteId })
+    });
+
+    let data = {};
+
+    try {
+      data = await response.json();
+    } catch (jsonException) {
+      console.error("Unable to parse delete response:", jsonException);
+    }
+
+    console.log("Delete Diary Response:", data);
+
+    if (!response.ok) {
+      throw new Error(data.REASON || data.reason || data.INFORMATION || "Unable to delete diary.");
+    }
+
+    if (data.RESP_STATUS && data.RESP_STATUS.toString().toUpperCase() === "FAIL") {
+      throw new Error(data.REASON || data.reason || data.INFORMATION || "Unable to delete diary.");
+    }
+
+    /* SMOOTH DELETE ANIMATION */
+    if (diaryItem) {
+      diaryItem.classList.add("deleting");
+      setTimeout(() => {
+        diaryItem.remove();
+        updateDiaryCountAfterDelete();
+      }, 350);
+    }
+
+    showToast("Diary entry deleted successfully!", "success");
+
+  } catch (error) {
+
+    console.error("Delete Diary Error:", error);
+    button.disabled = false;
+    button.innerHTML = originalButtonHTML;
+    showToast(error.message || "Unable to delete diary.", "error");
+
+  } finally {
+    confirmButton.disabled = false;
+  }
+}
+
+/* UPDATE DIARY COUNT */
+function updateDiaryCountAfterDelete() {
+
+  const diaryList = document.getElementById("diaryList");
+  const diaryCount = document.getElementById("diaryCount");
+  const count = diaryList.querySelectorAll(".diary-item").length;
+
+  diaryCount.innerText = count + (count === 1 ? " diary entry" : " diary entries");
+
+  if (count === 0) {
+    showEmptyState();
+  }
+}
+
+/* TOAST NOTIFICATION */
+function showToast(message, type = "success") {
+
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+
+  const iconElement = document.createElement("span");
+  iconElement.className = "toast-icon";
+  iconElement.textContent = type === "success" ? "✅" : "❌";
+
+  const messageElement = document.createElement("span");
+  messageElement.className = "toast-message";
+  messageElement.textContent = message;
+
+  toast.appendChild(iconElement);
+  toast.appendChild(messageElement);
+  container.appendChild(toast);
+
+  /* AUTO HIDE AFTER 5 SECONDS */
+  setTimeout(() => {
+    toast.classList.add("hide");
+    setTimeout(() => { toast.remove(); }, 300);
+  }, 5000);
+}
+
+/* EMPTY STATE */
+function showEmptyState() {
+
+  const diaryList = document.getElementById("diaryList");
+
+  diaryList.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">📖</div>
+      <h2>No Diary Entries Yet</h2>
+      <p>Start writing your thoughts, financial learnings and important moments.</p>
+      <a href="/finova/api/v1/journal" class="write-btn">✍️ Write Your First Diary</a>
+    </div>
+  `;
+}
+
+/* FORMAT DATE */
+function formatDate(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  if (typeof value === "string" && /^\d{2}-\d{2}-\d{4}$/.test(value)) {
+
+    const parts = value.split("-");
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+
+    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const monthIndex = parseInt(month, 10) - 1;
+
+    if (monthIndex < 0 || monthIndex > 11) {
+      return value;
+    }
+
+    return day + " " + monthNames[monthIndex] + " " + year;
+  }
+
+  try {
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+
+  } catch (error) {
+    return value;
+  }
+}
+
+/* HTML ESCAPE */
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/* INITIAL LOAD */
+document.addEventListener("DOMContentLoaded", function() {
+  loadDiaryList();
+});
+
+</script>
+</body>
+</html>

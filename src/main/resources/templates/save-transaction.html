@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finova - Add Transaction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b4b; --text:#475569; --muted:#94a3b8;
+  --brand:linear-gradient(135deg,#4f46e5,#7c3aed 50%,#db2777);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--sans)}
+body{
+  min-height:100vh;color:var(--ink);overflow-x:hidden;
+  background:
+    radial-gradient(circle at 5% 10%,rgba(168,85,247,.16),transparent 28%),
+    radial-gradient(circle at 95% 8%,rgba(236,72,153,.14),transparent 26%),
+    radial-gradient(circle at 90% 85%,rgba(20,184,166,.14),transparent 28%),
+    radial-gradient(circle at 8% 90%,rgba(249,115,22,.10),transparent 26%),
+    linear-gradient(135deg,#faf9ff,#fff7fb,#f5fdfa);
+  background-attachment:fixed;
+}
+:focus-visible{outline:3px solid #a855f7;outline-offset:2px}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:50;height:72px;padding:0 44px;background:var(--brand);color:#fff;display:flex;
+  align-items:center;justify-content:space-between;box-shadow:0 8px 30px rgba(79,70,229,.3)}
+.topbar-logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);
+  backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;position:relative}
+.logo-f{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1}
+.logo-leaf{position:absolute;top:-4px;right:-3px;width:17px;height:11px;background:linear-gradient(135deg,#bbf7d0,#22c55e);
+  border-radius:100% 0 100% 0;transform:rotate(-25deg)}
+.topbar-brand{font-family:var(--serif);font-size:27px;font-weight:700;letter-spacing:1.5px}
+.topbar-brand span{color:#fbcfe8}
+.back-btn{background:#fff;color:#6d28d9;border:none;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:700;
+  cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.15);transition:.25s}
+.back-btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.22)}
+
+/* HERO */
+.container{width:90%;max-width:920px;margin:38px auto 60px}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:36px 40px;margin-bottom:26px;color:#fff;
+  background:
+    radial-gradient(circle at 78% 30%,rgba(253,224,71,.32),transparent 22%),
+    radial-gradient(circle at 90% 80%,rgba(244,114,182,.45),transparent 25%),
+    linear-gradient(120deg,#4338ca,#7c3aed 45%,#db2777 80%,#f97316);
+  box-shadow:0 24px 50px rgba(124,58,237,.30)}
+.hero::before{content:"";position:absolute;width:260px;height:260px;right:-60px;top:-90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.hero .float{position:absolute;font-size:32px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.25));animation:floaty 5s ease-in-out infinite}
+.hero .f1{right:210px;top:22px;animation-delay:-1s}
+.hero .f2{right:40px;top:24px;font-size:40px;animation-delay:-2s}
+.hero .f3{right:150px;bottom:20px;font-size:30px;animation-delay:-3s}
+.hero .f4{right:30px;bottom:28px;font-size:60px}
+@keyframes floaty{50%{transform:translateY(-10px) rotate(6deg)}}
+.badge{display:inline-block;padding:7px 14px;margin-bottom:14px;border-radius:999px;background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+.title h1{font-family:var(--serif);font-size:40px;line-height:1.1;position:relative;text-shadow:0 4px 20px rgba(0,0,0,.18)}
+.title p{margin-top:10px;max-width:460px;font-size:15px;line-height:1.6;color:rgba(255,255,255,.9);position:relative}
+
+/* FORM CARD */
+.form-card{padding:34px;border-radius:28px;border:1.5px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#6366f1,#a855f7,#ec4899,#f97316) border-box;
+  box-shadow:0 2px 4px rgba(30,27,75,.04),0 20px 40px -10px rgba(30,27,75,.14),0 40px 80px -24px rgba(124,58,237,.35)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:20px}
+.form-group{display:flex;flex-direction:column}
+.full-width{margin-bottom:22px}
+label{color:var(--ink);font-weight:700;margin-bottom:8px;font-size:14px}
+input,select,textarea{width:100%;padding:14px 16px;border:1.5px solid #e5e7f5;border-radius:14px;outline:none;font-size:15px;
+  color:#334155;background:#f8f9ff;transition:.2s}
+input:hover,select:hover,textarea:hover{border-color:#c4b5fd}
+input:focus,select:focus,textarea:focus{border-color:#7c3aed;background:#fff;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+input::placeholder,textarea::placeholder{color:#a8b0c4}
+input[readonly]{background:#f1f5f9;color:#64748b;font-weight:700;cursor:default}
+select:disabled{background:#f1f5f9;color:#475569;cursor:not-allowed;opacity:1}
+textarea{resize:vertical;min-height:110px;line-height:1.7}
+.amount-wrap{position:relative}
+.amount-wrap span{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#6366f1,#ec4899)}
+.amount-wrap input{padding-left:56px;font-weight:700;font-size:16px}
+
+/* TRANSACTION TYPE */
+.type-container{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+.type-option input{display:none}
+.type-option label{display:flex;align-items:center;justify-content:center;gap:12px;margin:0;padding:18px 16px;border-radius:20px;
+  cursor:pointer;background:#faf9ff;color:#475569;border:2px solid #ece9ff;font-weight:800;letter-spacing:.5px;transition:.25s}
+.type-option label:hover{transform:translateY(-3px);box-shadow:0 12px 22px -8px rgba(30,27,75,.18)}
+.expense-symbol,.income-symbol{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff}
+.expense-symbol{background:linear-gradient(135deg,#f43f5e,#f97316)}
+.income-symbol{background:linear-gradient(135deg,#10b981,#14b8a6)}
+#expenseType:checked + label{background:linear-gradient(135deg,#fff1f2,#fff7ed);color:#be123c;border-color:#fb7185;
+  box-shadow:0 14px 28px -10px rgba(244,63,94,.5)}
+#incomeType:checked + label{background:linear-gradient(135deg,#ecfdf5,#f0fdfa);color:#047857;border-color:#34d399;
+  box-shadow:0 14px 28px -10px rgba(16,185,129,.5)}
+
+/* SAVE BUTTON */
+.save-btn{width:100%;padding:17px;border:none;border-radius:999px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;
+  cursor:pointer;transition:.3s;margin-top:6px;box-shadow:0 12px 26px -6px rgba(124,58,237,.5)}
+.save-btn:hover{transform:translateY(-3px);box-shadow:0 18px 32px -6px rgba(219,39,119,.5)}
+.save-btn:active{transform:scale(.98)}
+.save-btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+
+/* NOTIFICATIONS */
+#message{display:none;position:relative;align-items:center;gap:14px;padding:16px 18px;margin-bottom:22px;border-radius:18px;
+  overflow:hidden;text-align:left;animation:notificationSlideIn .4s ease forwards}
+#message.success{display:flex!important;background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #a7f3d0;
+  box-shadow:0 10px 24px rgba(16,185,129,.16);color:#065f46}
+#message.error{display:flex!important;background:linear-gradient(135deg,#fff1f2,#fff7ed);border:1px solid #fecdd3;
+  box-shadow:0 10px 24px rgba(225,29,72,.14);color:#9f1239}
+.notification-icon{width:40px;height:40px;min-width:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:800;color:#fff}
+#message.success .notification-icon{background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 6px 14px rgba(16,185,129,.3)}
+#message.error .notification-icon{background:linear-gradient(135deg,#e11d48,#f43f5e);box-shadow:0 6px 14px rgba(225,29,72,.25)}
+.notification-content{flex:1;min-width:0}
+.notification-title{font-size:14px;font-weight:800}
+.notification-subtitle{font-size:12px;margin-top:4px;line-height:1.5;opacity:.85}
+.notification-progress{position:absolute;bottom:0;left:0;width:100%;height:4px;transform-origin:left;animation:notificationProgress 5s linear forwards}
+#message.success .notification-progress{background:linear-gradient(90deg,#10b981,#14b8a6)}
+#message.error .notification-progress{background:linear-gradient(90deg,#f43f5e,#f97316)}
+#message.hide{animation:notificationSlideOut .35s ease forwards}
+@keyframes notificationSlideIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes notificationSlideOut{to{opacity:0;transform:translateY(-10px)}}
+@keyframes notificationProgress{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+@media (max-width:700px){
+  .form-row,.type-container{grid-template-columns:1fr;gap:16px}
+  .header{padding:0 18px}
+  .topbar-brand{font-size:23px}
+  .container{width:94%;margin:26px auto 50px}
+  .hero{padding:30px 24px}
+  .hero .f1,.hero .f3{display:none}
+  .hero .f4{font-size:44px;right:18px;bottom:18px}
+  .hero .f2{font-size:30px;right:18px;top:16px}
+  .title h1{font-size:30px}
+  .form-card{padding:24px 18px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="topbar-logo">
+        <div class="logo-icon"><div class="logo-f">F</div><div class="logo-leaf"></div></div>
+        <div class="topbar-brand">FIN<span>OVA</span></div>
+    </div>
+    <button class="back-btn" onclick="window.location.href='/customer/home'">← Dashboard</button>
+</header>
+
+<div class="container">
+
+    <section class="hero title">
+        <span class="float f1">🪙</span><span class="float f2">💳</span><span class="float f3">📈</span><span class="float f4">💸</span>
+        <div class="badge">✨ Quick Entry</div>
+        <h1>➕ Add Transaction</h1>
+        <p>Record your income or expense transaction</p>
+    </section>
+
+    <div class="form-card">
+
+        <!-- NOTIFICATION -->
+        <div id="message" role="status" aria-live="polite">
+            <div class="notification-icon"></div>
+            <div class="notification-content">
+                <div class="notification-title"></div>
+                <div class="notification-subtitle"></div>
+            </div>
+            <div class="notification-progress"></div>
+        </div>
+
+        <!-- TRANSACTION TYPE -->
+        <div class="full-width">
+
+            <label>🔁 Transaction Type</label>
+
+            <div class="type-container">
+
+                <div class="type-option">
+                    <input type="radio" id="expenseType" name="transactionType" value="EXPENSE" checked>
+                    <label for="expenseType">
+                        <span class="expense-symbol">▼</span>
+                        EXPENSE
+                    </label>
+                </div>
+
+                <div class="type-option">
+                    <input type="radio" id="incomeType" name="transactionType" value="INCOME">
+                    <label for="incomeType">
+                        <span class="income-symbol">▲</span>
+                        INCOME
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TRANSACTION DETAILS -->
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="transactionTitle">📝 Transaction Title</label>
+                <input type="text" id="transactionTitle" placeholder="e.g. Grocery Shopping">
+            </div>
+
+            <div class="form-group">
+                <label for="amount">💰 Amount</label>
+                <div class="amount-wrap">
+                    <span>₹</span>
+                    <input type="number" id="amount" placeholder="e.g. 2500" min="0" step="0.01">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CATEGORY AND PAYMENT MODE -->
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="transactionCategory">🏷️ Transaction Category</label>
+                <select id="transactionCategory">
+                    <option value="">Select Category</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="paymentMode">💳 Payment Mode</label>
+                <select id="paymentMode">
+                    <option value="">Select Payment Mode</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- CURRENCY AND LOCATION -->
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="currency">🌍 Currency</label>
+                <input type="text" id="currency" value="INR" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="location">📍 Location</label>
+                <input type="text" id="location" placeholder="e.g. Pune" required>
+            </div>
+
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="full-width">
+            <div class="form-group">
+                <label for="description">🗒️ Description</label>
+                <textarea id="description" placeholder="Enter transaction details..."></textarea>
+            </div>
+        </div>
+
+        <!-- SAVE BUTTON -->
+        <button class="save-btn" id="saveTransactionBtn" onclick="saveTransaction()">💾 Save Transaction</button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   NOTIFICATION TIMER
+========================= */
+
+let notificationTimer;
+
+
+/* =========================
+   EXPENSE CATEGORIES
+========================= */
+
+const expenseCategories = [
+    { value: "Send Money", text: "💸 Send Money" },
+    { value: "Groceries", text: "🛒 Groceries" },
+    { value: "Snacks & Sweets", text: "🍿 Snacks & Sweets" },
+    { value: "Food", text: "🍔 Food" },
+    { value: "Rent", text: "🏠 Rent" },
+    { value: "EMI", text: "💳 EMI" },
+    { value: "Trading", text: "📊 Trading" },
+    { value: "Investment", text: "💹 Investment" },
+    { value: "Travel", text: "🚗 Travel" },
+    { value: "Shopping", text: "🛍️ Shopping" },
+    { value: "Bills", text: "💡 Bills" },
+    { value: "Medical", text: "🏥 Medical" },
+    { value: "Entertainment", text: "🎬 Entertainment" },
+    { value: "Prepaid Card Amount Paid", text: "📤 Prepaid Card" },
+    { value: "Other", text: "📦 Other" }
+];
+
+
+/* =========================
+   INCOME CATEGORIES
+========================= */
+
+const incomeCategories = [
+    { value: "Salary", text: "💰 Salary" },
+    { value: "Prepaid Card Cash In", text: "📥 Prepaid Cash In" },
+    { value: "Receive Money", text: "⬇️ Receive Money" },
+    { value: "Trading", text: "📊 Trading" },
+    { value: "Investment", text: "💹 Investment" }
+];
+
+
+/* =========================
+   PAYMENT MODE DEFINITIONS
+========================= */
+
+const paymentModes = {
+    Cash: { value: "Cash", text: "💵 Cash" },
+    UPI: { value: "UPI", text: "📱 UPI" },
+    DebitCard: { value: "Debit Card", text: "💳 Debit Card" },
+    CreditCard: { value: "Credit Card", text: "💳 Credit Card" },
+    BankTransfer: { value: "Bank Transfer", text: "🏦 Bank Transfer" },
+    PrepaidCard: { value: "Prepaid Card", text: "💳 Prepaid Card" }
+};
+
+
+/* =========================
+   ALL PAYMENT MODES
+========================= */
+
+const allPaymentModes = [
+    paymentModes.Cash,
+    paymentModes.UPI,
+    paymentModes.DebitCard,
+    paymentModes.CreditCard,
+    paymentModes.BankTransfer
+];
+
+
+/* =========================
+   LOAD TRANSACTION CATEGORIES
+========================= */
+
+function loadTransactionCategories() {
+
+    const transactionCategory = document.getElementById("transactionCategory");
+
+    const transactionType =
+        document.querySelector('input[name="transactionType"]:checked').value;
+
+    transactionCategory.innerHTML = "";
+
+    const defaultOption = document.createElement("option");
+
+    defaultOption.value = "";
+    defaultOption.textContent = "Select Category";
+
+    transactionCategory.appendChild(defaultOption);
+
+    const categories =
+        transactionType === "INCOME" ? incomeCategories : expenseCategories;
+
+    categories.forEach(category => {
+
+        const option = document.createElement("option");
+
+        option.value = category.value;
+        option.textContent = category.text;
+
+        transactionCategory.appendChild(option);
+    });
+
+    resetPaymentMode();
+}
+
+
+/* =========================
+   RESET PAYMENT MODE
+========================= */
+
+function resetPaymentMode() {
+
+    const paymentMode = document.getElementById("paymentMode");
+
+    paymentMode.innerHTML = "";
+
+    const defaultOption = document.createElement("option");
+
+    defaultOption.value = "";
+    defaultOption.textContent = "Select Payment Mode";
+
+    paymentMode.appendChild(defaultOption);
+
+    paymentMode.disabled = true;
+}
+
+
+/* =========================
+   SET PAYMENT MODES
+========================= */
+
+function setPaymentModes(modes, autoSelect = false) {
+
+    const paymentMode = document.getElementById("paymentMode");
+
+    paymentMode.innerHTML = "";
+
+    if (modes.length > 1) {
+
+        const defaultOption = document.createElement("option");
+
+        defaultOption.value = "";
+        defaultOption.textContent = "Select Payment Mode";
+
+        paymentMode.appendChild(defaultOption);
+    }
+
+    modes.forEach(mode => {
+
+        const option = document.createElement("option");
+
+        option.value = mode.value;
+        option.textContent = mode.text;
+
+        paymentMode.appendChild(option);
+    });
+
+    if (autoSelect && modes.length === 1) {
+
+        paymentMode.value = modes[0].value;
+        paymentMode.disabled = true;
+
+    } else {
+
+        paymentMode.disabled = false;
+    }
+}
+
+
+/* =========================
+   UPDATE PAYMENT MODE
+   BASED ON CATEGORY
+========================= */
+
+function updatePaymentMode() {
+
+    const transactionType =
+        document.querySelector('input[name="transactionType"]:checked').value;
+
+    const transactionCategory =
+        document.getElementById("transactionCategory").value;
+
+    /* NO CATEGORY SELECTED */
+
+    if (transactionCategory === "") {
+        resetPaymentMode();
+        return;
+    }
+
+    /* INCOME */
+
+    if (transactionType === "INCOME") {
+
+        if (transactionCategory === "Salary") {
+            setPaymentModes([paymentModes.BankTransfer], true);
+            return;
+        }
+
+        if (transactionCategory === "Prepaid Card Cash In") {
+            setPaymentModes([paymentModes.PrepaidCard], true);
+            return;
+        }
+
+        if (transactionCategory === "Receive Money") {
+            setPaymentModes([paymentModes.Cash, paymentModes.UPI, paymentModes.BankTransfer]);
+            return;
+        }
+
+        if (transactionCategory === "Trading") {
+            setPaymentModes([paymentModes.BankTransfer], true);
+            return;
+        }
+
+        if (transactionCategory === "Investment") {
+            setPaymentModes([paymentModes.BankTransfer], true);
+            return;
+        }
+    }
+
+    /* EXPENSE */
+
+    if (transactionType === "EXPENSE") {
+
+        if (transactionCategory === "Send Money") {
+            setPaymentModes([paymentModes.UPI, paymentModes.Cash]);
+            return;
+        }
+
+        if (transactionCategory === "Groceries") {
+            setPaymentModes([paymentModes.UPI, paymentModes.Cash]);
+            return;
+        }
+
+        if (transactionCategory === "Snacks & Sweets") {
+            setPaymentModes([paymentModes.UPI, paymentModes.Cash]);
+            return;
+        }
+
+        if (transactionCategory === "Prepaid Card Amount Paid") {
+            setPaymentModes([paymentModes.DebitCard, paymentModes.CreditCard]);
+            return;
+        }
+
+        /* Food, Rent, Travel, Bills, Medical, Entertainment */
+
+        if (
+            transactionCategory === "Food" ||
+            transactionCategory === "Rent" ||
+            transactionCategory === "Travel" ||
+            transactionCategory === "Bills" ||
+            transactionCategory === "Medical" ||
+            transactionCategory === "Entertainment"
+        ) {
+            setPaymentModes([paymentModes.UPI, paymentModes.Cash]);
+            return;
+        }
+
+        /* EMI, Trading, Investment */
+
+        if (
+            transactionCategory === "EMI" ||
+            transactionCategory === "Trading" ||
+            transactionCategory === "Investment"
+        ) {
+            setPaymentModes([paymentModes.UPI], true);
+            return;
+        }
+
+        if (transactionCategory === "Shopping") {
+            setPaymentModes([
+                paymentModes.UPI,
+                paymentModes.Cash,
+                paymentModes.DebitCard,
+                paymentModes.CreditCard
+            ]);
+            return;
+        }
+
+        if (transactionCategory === "Other") {
+            setPaymentModes(allPaymentModes);
+            return;
+        }
+    }
+}
+
+
+/* =========================
+   TRANSACTION TYPE CHANGE
+========================= */
+
+document
+    .querySelectorAll('input[name="transactionType"]')
+    .forEach(radio => {
+        radio.addEventListener("change", loadTransactionCategories);
+    });
+
+
+/* =========================
+   CATEGORY CHANGE
+========================= */
+
+document
+    .getElementById("transactionCategory")
+    .addEventListener("change", updatePaymentMode);
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+loadTransactionCategories();
+
+
+/* =========================
+   SAVE TRANSACTION
+========================= */
+
+function saveTransaction() {
+
+    const transactionTitle = document.getElementById("transactionTitle").value.trim();
+    const amount = document.getElementById("amount").value.trim();
+    const transactionCategory = document.getElementById("transactionCategory").value;
+    const currency = document.getElementById("currency").value;
+    const paymentMode = document.getElementById("paymentMode").value;
+    const location = document.getElementById("location").value.trim();
+    const description = document.getElementById("description").value.trim();
+
+    const transactionType =
+        document.querySelector('input[name="transactionType"]:checked').value;
+
+
+    /* BASIC VALIDATION */
+
+    if (transactionTitle === "") {
+        showMessage("Please enter Transaction Title", "error");
+        return;
+    }
+
+    if (amount === "") {
+        showMessage("Please enter Amount", "error");
+        return;
+    }
+
+    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+        showMessage("Amount must be greater than 0", "error");
+        return;
+    }
+
+    if (transactionCategory === "") {
+        showMessage("Please select Transaction Category", "error");
+        return;
+    }
+
+    if (currency === "") {
+        showMessage("Please select Currency", "error");
+        return;
+    }
+
+    if (paymentMode === "") {
+        showMessage("Please select Payment Mode", "error");
+        return;
+    }
+
+    /* LOCATION VALIDATION */
+
+    if (location === "") {
+        showMessage("Please enter Location", "error");
+        document.getElementById("location").focus();
+        return;
+    }
+
+
+    /* TRANSACTION REQUEST */
+
+    const transactionRequest = {
+        transactionTitle: transactionTitle,
+        amount: amount,
+        currency: currency,
+        transactionCategory: transactionCategory,
+        description: description,
+        paymentMode: paymentMode,
+        location: location,
+        transactionType: transactionType
+    };
+
+
+    /* CALL SPRING BOOT API */
+
+    const saveButton = document.getElementById("saveTransactionBtn");
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving Transaction...";
+
+    fetch("/finova/api/v1/save/transaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(transactionRequest)
+    })
+
+    .then(response => {
+
+        if (!response.ok) {
+            throw new Error("Unable to save transaction");
+        }
+
+        return response.json();
+    })
+
+    .then(data => {
+
+        console.log("Transaction Response:", data);
+
+        /* HANDLE BUSINESS FAILURE RESPONSE */
+
+        if (data.RESP_STATUS && String(data.RESP_STATUS).toUpperCase() === "FAIL") {
+            throw new Error(
+                data.REASON ||
+                data.INFORMATION ||
+                "Unable to save transaction."
+            );
+        }
+
+        showMessage("Transaction saved successfully!", "success");
+
+        /* RESET FORM */
+
+        document.getElementById("transactionTitle").value = "";
+        document.getElementById("amount").value = "";
+        document.getElementById("transactionCategory").value = "";
+        document.getElementById("currency").value = "INR";
+
+        resetPaymentMode();
+
+        document.getElementById("location").value = "";
+        document.getElementById("description").value = "";
+    })
+
+    .catch(error => {
+
+        console.error("Transaction Save Error:", error);
+
+        showMessage(
+            error.message || "Failed to save transaction. Please try again.",
+            "error"
+        );
+    })
+
+    .finally(() => {
+
+        saveButton.disabled = false;
+        saveButton.textContent = "💾 Save Transaction";
+    });
+}
+
+
+/* =========================
+   SHOW MESSAGE
+   SUCCESS / ERROR
+========================= */
+
+function showMessage(text, type) {
+
+    const message = document.getElementById("message");
+
+    /* CLEAR PREVIOUS TIMER */
+
+    clearTimeout(notificationTimer);
+
+    /* RESET PREVIOUS ANIMATION */
+
+    message.className = "";
+
+    message.innerHTML = `
+        <div class="notification-icon"></div>
+
+        <div class="notification-content">
+            <div class="notification-title"></div>
+            <div class="notification-subtitle"></div>
+        </div>
+
+        <div class="notification-progress"></div>
+    `;
+
+    /* SET NOTIFICATION TYPE */
+
+    message.classList.add(type);
+
+    const icon = message.querySelector(".notification-icon");
+    const title = message.querySelector(".notification-title");
+    const subtitle = message.querySelector(".notification-subtitle");
+
+    if (type === "success") {
+
+        icon.textContent = "✓";
+        title.textContent = "Transaction Saved Successfully!";
+        subtitle.textContent = "Your transaction has been recorded successfully.";
+
+    } else {
+
+        icon.textContent = "!";
+        title.textContent = "Transaction Failed";
+        subtitle.textContent = text;
+    }
+
+    /* SHOW FOR 5 SECONDS */
+
+    notificationTimer = setTimeout(() => {
+
+        message.classList.add("hide");
+
+        setTimeout(() => {
+            message.className = "";
+            message.innerHTML = "";
+        }, 350);
+
+    }, 5000);
+}
+
+</script>
+
+</body>
+</html>

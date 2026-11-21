@@ -1,0 +1,1392 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Finova - Monthly Report</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 8% 15%, rgba(168,85,247,.08), transparent 25%),
+        radial-gradient(circle at 92% 15%, rgba(236,72,153,.07), transparent 25%),
+        radial-gradient(circle at 15% 90%, rgba(34,197,94,.05), transparent 25%),
+        linear-gradient(135deg, #fbfaff, #fef9fc, #f8fdf9);
+    color: #1f2937;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: "FINOVA";
+    position: fixed;
+    font-size: 150px;
+    font-weight: 900;
+    letter-spacing: 18px;
+    color: rgba(124,58,237,.025);
+    transform: rotate(-18deg);
+    white-space: nowrap;
+    left: 50%;
+    top: 42%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.topbar {
+    width: 100%;
+    height: 75px;
+    padding: 0 45px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+    box-shadow: 0 5px 20px rgba(0,0,0,.15);
+    position: relative;
+    z-index: 2;
+}
+
+.topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(168,85,247,.4);
+}
+
+.logo-f {
+    color: white;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.logo-leaf {
+    position: absolute;
+    top: 2px;
+    right: 1px;
+    width: 16px;
+    height: 10px;
+    background: linear-gradient(135deg, #86efac, #22c55e);
+    border-radius: 100% 0 100% 0;
+    transform: rotate(-25deg);
+}
+
+.topbar-brand {
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: white;
+}
+
+.topbar-brand span {
+    color: #fbcfe8;
+}
+
+.dashboard-btn {
+    background: white;
+    color: #7c3aed;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.dashboard-btn:hover {
+    background: #faf5ff;
+    transform: translateY(-1px);
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 40px auto;
+    position: relative;
+    z-index: 1;
+}
+
+.page-heading {
+    margin-bottom: 25px;
+}
+
+.page-heading h1 {
+    color: #312e81;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.page-heading p {
+    color: #64748b;
+    margin-top: 8px;
+    font-size: 15px;
+}
+
+.report-card,
+.result-card {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.10);
+    margin-bottom: 25px;
+}
+
+.card-heading {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f3efff, #fdf1f7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 6px 15px rgba(124,58,237,.08);
+}
+
+.card-heading h2 {
+    color: #7c3aed;
+    font-size: 21px;
+}
+
+.card-heading p {
+    color: #6b7280;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.month-section {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    color: #312e81;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    outline: none;
+    font-size: 15px;
+    background: #f8fafc;
+    transition: .2s;
+    cursor: pointer;
+}
+
+select:focus {
+    border-color: #7c3aed;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(124,58,237,.10);
+}
+
+.button-container {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 15px;
+}
+
+.report-btn,
+.download-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.report-btn {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+}
+
+.download-btn {
+    background: linear-gradient(135deg, #16a34a, #059669);
+}
+
+.report-btn:hover,
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+
+.report-btn:disabled,
+.download-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error {
+    display: none;
+    margin-top: 18px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    background: #fee2e2;
+    color: #991b1b;
+    font-size: 14px;
+    border-left: 4px solid #dc2626;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(31,41,55,.05);
+    border-left: 4px solid #8b5cf6;
+}
+
+.summary-card p {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.summary-card h2 {
+    margin-top: 8px;
+    font-size: 25px;
+    overflow-wrap: anywhere;
+}
+
+.balance-total {
+    border-left-color: #16a34a;
+}
+
+.balance-positive {
+    border-left-color: #16a34a;
+}
+
+.balance-positive h2 {
+    color: #16a34a;
+}
+
+.balance-negative {
+    border-left-color: #dc2626;
+}
+
+.balance-negative h2 {
+    color: #dc2626;
+}
+
+.transaction-total {
+    border-left-color: #7c3aed;
+}
+
+.transaction-total h2 {
+    color: #7c3aed;
+}
+
+.month-total {
+    border-left-color: #db2777;
+}
+
+.month-total h2 {
+    color: #db2777;
+    font-size: 17px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.result-header h2 {
+    font-size: 21px;
+    color: #312e81;
+}
+
+.count-badge {
+    background: linear-gradient(135deg, #f3efff, #fdf1f7);
+    color: #7c3aed;
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: linear-gradient(90deg, #f8f6ff, #fdf7fa);
+}
+
+th {
+    text-align: left;
+    padding: 15px;
+    font-size: 13px;
+    color: #6d28d9;
+    white-space: nowrap;
+}
+
+td {
+    padding: 16px 15px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+tbody tr {
+    transition: .2s;
+}
+
+tbody tr:hover {
+    background: #fcfaff;
+}
+
+.transaction-title {
+    font-weight: 600;
+    color: #111827;
+}
+
+.category {
+    background: #f3e8ff;
+    color: #7e22ce;
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.income-amount {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.expense-amount {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+.expense-badge {
+    background: #fce7f3;
+    color: #be185d;
+    padding: 6px 11px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.income-badge {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 6px 11px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.date {
+    color: #4b5563;
+    font-weight: 500;
+}
+
+.empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.empty-logo {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 18px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(124,58,237,.18);
+}
+
+.empty-document {
+    width: 34px;
+    height: 42px;
+    background: white;
+    border-radius: 6px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,.10);
+}
+
+.empty-document::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 3px;
+    background: #a855f7;
+    border-radius: 3px;
+    top: 12px;
+    left: 8px;
+    box-shadow: 0 7px 0 #e9d5ff, 0 14px 0 #fbcfe8;
+}
+
+.empty-search {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid #22c55e;
+    box-shadow: 0 3px 8px rgba(0,0,0,.12);
+}
+
+.empty-search::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 4px;
+    background: #22c55e;
+    border-radius: 3px;
+    right: -7px;
+    bottom: -4px;
+    transform: rotate(45deg);
+}
+
+.empty h3 {
+    color: #7c3aed;
+    margin-bottom: 7px;
+    font-size: 18px;
+}
+
+.empty p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 35px;
+    color: #7c3aed;
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+    .topbar {
+        padding: 0 20px;
+        height: 75px;
+    }
+
+    .topbar-brand {
+        font-size: 25px;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .logo-f {
+        font-size: 23px;
+    }
+
+    .dashboard-btn {
+        padding: 9px 13px;
+        font-size: 12px;
+    }
+
+    .container {
+        width: 94%;
+        margin: 30px auto;
+    }
+
+    .page-heading h1 {
+        font-size: 28px;
+    }
+
+    .report-card,
+    .result-card {
+        padding: 25px 20px;
+    }
+
+    .month-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .button-container {
+        grid-column: auto;
+        flex-direction: column;
+    }
+
+    .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .result-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="topbar-logo">
+        <div class="logo-icon">
+            <div class="logo-f">F</div>
+            <div class="logo-leaf"></div>
+        </div>
+
+        <div class="topbar-brand">
+            FIN<span>OVA</span>
+        </div>
+    </div>
+
+    <button class="dashboard-btn"
+            onclick="window.location.href='/customer/home'">
+        ← Dashboard
+    </button>
+</header>
+
+<div class="container">
+
+    <div class="page-heading">
+        <h1>📊 Monthly Report</h1>
+        <p>Select a report type, month and year to view your report</p>
+    </div>
+
+    <div class="report-card">
+
+        <div class="card-heading">
+            <div class="icon-box">📅</div>
+
+            <div>
+                <h2>Monthly Report</h2>
+                <p>Select report type, month and year to generate the report</p>
+            </div>
+        </div>
+
+        <div class="month-section">
+
+            <!-- REPORT TYPE -->
+            <div class="form-group">
+                <label for="reportType">Report Type</label>
+
+                <select id="reportType">
+                    <option value="TRANSACTION">Transaction Report</option>
+                    <option value="TRADING">Trading Report</option>
+                </select>
+            </div>
+
+            <!-- MONTH -->
+            <div class="form-group">
+                <label for="month">Month</label>
+
+                <select id="month">
+                    <option value="">Select Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <!-- YEAR -->
+            <div class="form-group">
+                <label for="year">Year</label>
+
+                <select id="year">
+                    <option value="">Select Year</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                </select>
+            </div>
+
+            <div class="button-container">
+                <button type="button"
+                        class="report-btn"
+                        onclick="getMonthlyReport()">
+                    📊 Generate Report
+                </button>
+
+                <button type="button"
+                        class="download-btn"
+                        onclick="downloadMonthlyReport()">
+                    📥 Download Report
+                </button>
+            </div>
+
+        </div>
+
+        <div id="errorMessage" class="error"></div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+
+        <div class="summary-card balance-total">
+            <p>Monthly Balance</p>
+            <h2 id="totalBalance">₹ 0.00</h2>
+        </div>
+
+        <div class="summary-card transaction-total">
+            <p id="countLabel">Total Transactions</p>
+            <h2 id="transactionCount">0</h2>
+        </div>
+
+        <div class="summary-card month-total">
+            <p>Selected Report</p>
+            <h2 id="selectedMonth">-</h2>
+        </div>
+
+    </div>
+
+    <!-- RESULTS -->
+    <div class="result-card">
+
+        <div class="result-header">
+            <h2 id="resultHeading">📋 Monthly Report Results</h2>
+
+            <div id="resultCount" class="count-badge">
+                0 Records
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            🔄 Fetching monthly report...
+        </div>
+
+        <div id="empty" class="empty">
+            <div class="empty-logo">
+                <div class="empty-document"></div>
+                <div class="empty-search"></div>
+            </div>
+
+            <h3>No report loaded</h3>
+
+            <p>
+                Select Report Type, Month and Year,
+                then click Generate Report.
+            </p>
+        </div>
+
+        <div id="tableWrapper"
+             class="table-wrapper"
+             style="display:none;">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction / Trade</th>
+                        <th>Date</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Payment Mode</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+
+                <tbody id="transactionTable"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ==================================================
+   COMMON HELPERS
+================================================== */
+
+function getRequestData() {
+
+    const reportType =
+        document.getElementById("reportType").value;
+
+    const month =
+        document.getElementById("month").value;
+
+    const year =
+        document.getElementById("year").value;
+
+    if (!reportType || !month || !year) {
+        throw new Error(
+            "Please select Report Type, Month and Year."
+        );
+    }
+
+    const monthValue =
+        String(month).padStart(2, "0");
+
+    const yearValue =
+        String(year);
+
+    const firstDay =
+        `01-${monthValue}-${yearValue}`;
+
+    const lastDayNumber =
+        new Date(
+            parseInt(yearValue, 10),
+            parseInt(monthValue, 10),
+            0
+        ).getDate();
+
+    const lastDay =
+        `${String(lastDayNumber).padStart(2, "0")}-${monthValue}-${yearValue}`;
+
+    return {
+        reportType: reportType,
+        fromDate: firstDay,
+        toDate: lastDay,
+        month: monthValue,
+        year: yearValue
+    };
+}
+
+
+function getSelectedMonthName() {
+
+    const month =
+        parseInt(document.getElementById("month").value, 10);
+
+    const monthNames = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+
+    return monthNames[month - 1];
+}
+
+
+function showError(message) {
+
+    const error =
+        document.getElementById("errorMessage");
+
+    error.innerText = message;
+    error.style.display = "block";
+}
+
+
+function hideError() {
+
+    document.getElementById("errorMessage")
+        .style.display = "none";
+}
+
+
+/* ==================================================
+   GENERATE MONTHLY REPORT
+================================================== */
+
+async function getMonthlyReport() {
+
+    const loading =
+        document.getElementById("loading");
+
+    const empty =
+        document.getElementById("empty");
+
+    const tableWrapper =
+        document.getElementById("tableWrapper");
+
+    const table =
+        document.getElementById("transactionTable");
+
+    const reportButton =
+        document.querySelector(".report-btn");
+
+    let requestData;
+
+    try {
+        requestData = getRequestData();
+    } catch (exception) {
+        showError(exception.message);
+        return;
+    }
+
+    hideError();
+
+    loading.style.display = "block";
+    empty.style.display = "none";
+    tableWrapper.style.display = "none";
+    table.innerHTML = "";
+
+    reportButton.disabled = true;
+    reportButton.innerText = "⏳ Generating Report...";
+
+    try {
+
+        const response = await fetch(
+            "/finova/api/v1/monthly/report",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestData)
+            }
+        );
+
+        let data = {};
+
+        try {
+            data = await response.json();
+        } catch (jsonException) {
+            console.error(
+                "Unable to parse backend response:",
+                jsonException
+            );
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.REASON ||
+                data.reason ||
+                data.INFORMATION ||
+                "Unable to fetch monthly report."
+            );
+        }
+
+        if (
+            data.RESP_STATUS &&
+            data.RESP_STATUS.toString().toUpperCase() === "FAIL"
+        ) {
+            throw new Error(
+                data.REASON ||
+                data.reason ||
+                data.INFORMATION ||
+                "Unable to fetch monthly report."
+            );
+        }
+
+        /*
+         * The backend should return the records for the selected
+         * reportType in the monthlyReport array.
+         */
+        const transactions =
+            data.monthlyReport || [];
+
+        const isTrading =
+            requestData.reportType === "TRADING";
+
+        document.getElementById("selectedMonth").innerText =
+            (isTrading ? "Trading - " : "Transaction - ") +
+            getSelectedMonthName() + " " + requestData.year;
+
+        document.getElementById("resultHeading").innerText =
+            isTrading
+                ? "📋 Monthly Trading Report"
+                : "📋 Monthly Transaction Report";
+
+        document.getElementById("countLabel").innerText =
+            isTrading ? "Total Trades" : "Total Transactions";
+
+        if (!Array.isArray(transactions)) {
+            throw new Error(
+                "Invalid report data received from the backend."
+            );
+        }
+
+        if (transactions.length === 0) {
+
+            empty.style.display = "block";
+
+            empty.querySelector("h3").innerText =
+                isTrading
+                    ? "No trades found"
+                    : "No transactions found";
+
+            empty.querySelector("p").innerText =
+                "No records found for the selected report type and month.";
+
+            updateSummary([]);
+
+            document.getElementById("resultCount").innerText =
+                "0 Records";
+
+            return;
+        }
+
+        transactions.forEach(transaction => {
+
+            const row = document.createElement("tr");
+
+            const title =
+                transaction.transactionTitle ||
+                transaction.trasactionTitle ||
+                transaction.tradeTitle ||
+                transaction.symbol ||
+                transaction.tradingSymbol ||
+                "-";
+
+            const date =
+                transaction.date ||
+                transaction.dateAndTime ||
+                transaction.tradeDate ||
+                transaction.entryDate ||
+                "-";
+
+            const category =
+                transaction.transactionCategory ||
+                transaction.category ||
+                transaction.tradeType ||
+                "-";
+
+            const amount =
+                transaction.amount ??
+                transaction.profitLoss ??
+                transaction.netProfitLoss ??
+                0;
+
+            const paymentMode =
+                transaction.paymentMode ||
+                transaction.tradeStatus ||
+                transaction.status ||
+                "-";
+
+            const location =
+                transaction.location ||
+                transaction.exchange ||
+                transaction.market ||
+                "-";
+
+            const transactionType =
+                (
+                    transaction.transactionType ||
+                    transaction.type ||
+                    transaction.tradeType ||
+                    "EXPENSE"
+                ).toString().trim().toUpperCase();
+
+            const isIncome =
+                transactionType === "INCOME" ||
+                transactionType === "PROFIT";
+
+            const amountClass =
+                isIncome ? "income-amount" : "expense-amount";
+
+            const typeLabel =
+                isTrading
+                    ? transaction.tradeType ||
+                      transaction.type ||
+                      transaction.tradeStatus ||
+                      "-"
+                    : transaction.transactionType || "EXPENSE";
+
+            row.innerHTML = `
+                <td class="transaction-title">
+                    ${escapeHtml(title)}
+                </td>
+
+                <td class="date">
+                    ${escapeHtml(formatDate(date))}
+                </td>
+
+                <td>
+                    <span class="category">
+                        ${escapeHtml(category)}
+                    </span>
+                </td>
+
+                <td class="${amountClass}">
+                    ₹ ${escapeHtml(amount)}
+                </td>
+
+                <td>
+                    ${escapeHtml(paymentMode)}
+                </td>
+
+                <td>
+                    📍 ${escapeHtml(location)}
+                </td>
+
+                <td>
+                    <span class="${
+                        isIncome ? "income-badge" : "expense-badge"
+                    }">
+                        ${escapeHtml(typeLabel)}
+                    </span>
+                </td>
+            `;
+
+            table.appendChild(row);
+        });
+
+        tableWrapper.style.display = "block";
+
+        updateSummary(transactions);
+
+        document.getElementById("resultCount").innerText =
+            transactions.length + " Records";
+
+    } catch (exception) {
+
+        console.error("Monthly Report Error:", exception);
+
+        showError(
+            exception.message ||
+            "Unable to fetch monthly report."
+        );
+
+        empty.style.display = "block";
+
+    } finally {
+
+        loading.style.display = "none";
+
+        reportButton.disabled = false;
+        reportButton.innerText = "📊 Generate Report";
+    }
+}
+
+
+/* ==================================================
+   DOWNLOAD MONTHLY REPORT CSV
+================================================== */
+
+async function downloadMonthlyReport() {
+
+    const downloadButton =
+        document.querySelector(".download-btn");
+
+    let requestData;
+
+    try {
+        requestData = getRequestData();
+    } catch (exception) {
+        showError(
+            exception.message.replace(
+                "Please select",
+                "Please select"
+            ) + " before downloading."
+        );
+        return;
+    }
+
+    hideError();
+
+    downloadButton.disabled = true;
+    downloadButton.innerText = "⏳ Preparing CSV...";
+
+    try {
+
+        const response = await fetch(
+            "/finova/api/v1/download/monthly/report",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestData)
+            }
+        );
+
+        if (!response.ok) {
+
+            let errorData = {};
+
+            try {
+                errorData = await response.json();
+            } catch (jsonException) {
+                console.error(
+                    "Unable to parse download error:",
+                    jsonException
+                );
+            }
+
+            throw new Error(
+                errorData.REASON ||
+                errorData.reason ||
+                errorData.INFORMATION ||
+                "Unable to download monthly report."
+            );
+        }
+
+        const contentType =
+            response.headers.get("content-type") || "";
+
+        /*
+         * If the server returns JSON instead of a CSV file,
+         * display the backend error message.
+         */
+        if (contentType.includes("application/json")) {
+
+            const errorData = await response.json();
+
+            throw new Error(
+                errorData.REASON ||
+                errorData.reason ||
+                errorData.INFORMATION ||
+                "The server did not return a CSV file."
+            );
+        }
+
+        const blob = await response.blob();
+
+        if (blob.size === 0) {
+            throw new Error("Monthly report is empty.");
+        }
+
+        const downloadUrl =
+            window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        const reportType =
+            requestData.reportType;
+
+        link.href = downloadUrl;
+
+        link.download =
+            `Finova_${reportType}_Report_${getSelectedMonthName()}_${requestData.year}.csv`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(downloadUrl);
+
+        downloadButton.innerText = "✅ Downloaded";
+
+        setTimeout(() => {
+            downloadButton.innerText = "📥 Download Report";
+        }, 2000);
+
+    } catch (exception) {
+
+        console.error(
+            "Monthly Report Download Error:",
+            exception
+        );
+
+        showError(
+            exception.message ||
+            "Unable to download monthly report."
+        );
+
+        downloadButton.innerText = "📥 Download Report";
+
+    } finally {
+
+        downloadButton.disabled = false;
+    }
+}
+
+
+/* ==================================================
+   SUMMARY
+================================================== */
+
+function updateSummary(transactions) {
+
+    let balance = 0;
+
+    transactions.forEach(transaction => {
+
+        const amount = parseFloat(
+            transaction.amount ??
+            transaction.profitLoss ??
+            transaction.netProfitLoss ??
+            0
+        );
+
+        if (isNaN(amount)) {
+            return;
+        }
+
+        const transactionType = (
+            transaction.transactionType ||
+            transaction.type ||
+            transaction.tradeType ||
+            "EXPENSE"
+        ).toString().trim().toUpperCase();
+
+        if (
+            transactionType === "INCOME" ||
+            transactionType === "PROFIT"
+        ) {
+            balance += Math.abs(amount);
+        } else if (
+            transactionType === "EXPENSE" ||
+            transactionType === "LOSS"
+        ) {
+            balance -= Math.abs(amount);
+        } else {
+            /*
+             * For trading records without a recognized profit/loss
+             * type, use the supplied amount as-is.
+             */
+            balance += amount;
+        }
+    });
+
+    const balanceElement =
+        document.getElementById("totalBalance");
+
+    const balanceCard =
+        balanceElement.closest(".summary-card");
+
+    const formattedBalance =
+        Math.abs(balance).toLocaleString(
+            "en-IN",
+            {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }
+        );
+
+    balanceElement.innerText =
+        (balance < 0 ? "- ₹ " : "+ ₹ ") + formattedBalance;
+
+    balanceCard.classList.remove(
+        "balance-positive",
+        "balance-negative"
+    );
+
+    balanceCard.classList.add(
+        balance >= 0 ? "balance-positive" : "balance-negative"
+    );
+
+    document.getElementById("transactionCount").innerText =
+        transactions.length;
+}
+
+
+/* ==================================================
+   DATE FORMAT
+================================================== */
+
+function formatDate(dateString) {
+
+    if (!dateString || dateString === "-") {
+        return "-";
+    }
+
+    if (/^\d{2}-\d{2}-\d{4}$/.test(String(dateString))) {
+
+        const parts = String(dateString).split("-");
+
+        const day = parts[0];
+        const month = parseInt(parts[1], 10) - 1;
+        const year = parts[2];
+
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+
+        return day + "/" + months[month] + "/" + year;
+    }
+
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+        return String(dateString);
+    }
+
+    const months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return day + "/" + month + "/" + year;
+}
+
+
+/* ==================================================
+   HTML ESCAPE
+================================================== */
+
+function escapeHtml(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+</script>
+
+</body>
+</html>

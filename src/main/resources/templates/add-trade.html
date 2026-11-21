@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finova - Add Trade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1e1b4b; --text:#475569; --muted:#94a3b8;
+  --brand:linear-gradient(135deg,#4f46e5,#7c3aed 50%,#db2777);
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--sans)}
+body{
+  min-height:100vh;color:var(--ink);overflow-x:hidden;position:relative;
+  background:
+    radial-gradient(circle at 5% 10%,rgba(168,85,247,.16),transparent 28%),
+    radial-gradient(circle at 95% 8%,rgba(236,72,153,.14),transparent 26%),
+    radial-gradient(circle at 90% 85%,rgba(20,184,166,.14),transparent 28%),
+    radial-gradient(circle at 8% 90%,rgba(249,115,22,.10),transparent 26%),
+    linear-gradient(135deg,#faf9ff,#fff7fb,#f5fdfa);
+  background-attachment:fixed;
+}
+body::before{content:"FINOVA";position:fixed;font-family:var(--serif);font-size:clamp(70px,13vw,150px);font-weight:700;letter-spacing:18px;
+  color:rgba(124,58,237,.03);transform:rotate(-18deg);white-space:nowrap;left:50%;top:42%;pointer-events:none;z-index:0}
+:focus-visible{outline:3px solid #a855f7;outline-offset:2px}
+input[type="number"]{-moz-appearance:textfield;appearance:textfield}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:50;min-height:72px;padding:12px 44px;background:var(--brand);color:#fff;display:flex;
+  align-items:center;justify-content:space-between;box-shadow:0 8px 30px rgba(79,70,229,.3)}
+.topbar-logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);
+  backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;position:relative}
+.logo-f{font-family:var(--serif);font-size:26px;font-weight:700;line-height:1}
+.logo-leaf{position:absolute;top:-4px;right:-3px;width:17px;height:11px;background:linear-gradient(135deg,#bbf7d0,#22c55e);
+  border-radius:100% 0 100% 0;transform:rotate(-25deg)}
+.topbar-brand{font-family:var(--serif);font-size:27px;font-weight:700;letter-spacing:1.5px;color:#fff}
+.topbar-brand span{color:#fbcfe8}
+.back-btn{background:#fff;color:#6d28d9;border:none;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:700;
+  cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.15);transition:.25s}
+.back-btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.22)}
+
+/* HERO */
+.container{position:relative;z-index:1;width:90%;max-width:940px;margin:38px auto 60px}
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:36px 40px;margin-bottom:26px;color:#fff;
+  background:
+    radial-gradient(circle at 78% 30%,rgba(253,224,71,.32),transparent 22%),
+    radial-gradient(circle at 90% 80%,rgba(244,114,182,.45),transparent 25%),
+    linear-gradient(120deg,#4338ca,#7c3aed 45%,#db2777 80%,#f97316);
+  box-shadow:0 24px 50px rgba(124,58,237,.30)}
+.hero::before{content:"";position:absolute;width:260px;height:260px;right:-60px;top:-90px;border-radius:50%;background:rgba(255,255,255,.14)}
+.hero .float{position:absolute;font-size:32px;filter:drop-shadow(0 8px 12px rgba(0,0,0,.25));animation:floaty 5s ease-in-out infinite}
+.hero .f1{right:220px;top:22px;animation-delay:-1s}
+.hero .f2{right:40px;top:24px;font-size:40px;animation-delay:-2s}
+.hero .f3{right:160px;bottom:20px;font-size:30px;animation-delay:-3s}
+.hero .f4{right:30px;bottom:28px;font-size:62px}
+@keyframes floaty{50%{transform:translateY(-10px) rotate(6deg)}}
+.badge{display:inline-block;padding:7px 14px;margin-bottom:14px;border-radius:999px;background:rgba(255,255,255,.2);
+  border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;backdrop-filter:blur(6px)}
+.title h1{font-family:var(--serif);font-size:40px;line-height:1.1;position:relative;text-shadow:0 4px 20px rgba(0,0,0,.18)}
+.title p{margin-top:10px;max-width:480px;font-size:15px;line-height:1.6;color:rgba(255,255,255,.9);position:relative}
+
+/* TABS */
+.form-toggle{display:flex;gap:8px;padding:8px;margin-bottom:24px;border-radius:999px;background:#fff;
+  border:1px solid #f1f5f9;box-shadow:0 12px 28px -10px rgba(30,27,75,.18)}
+.toggle-btn{flex:1;padding:14px 10px;border:none;border-radius:999px;background:transparent;color:#64748b;font-weight:800;
+  cursor:pointer;font-size:14px;transition:.25s}
+.toggle-btn:hover{background:#f5f3ff;color:#6d28d9}
+.toggle-btn.active{color:#fff;background:var(--brand);box-shadow:0 10px 22px -6px rgba(124,58,237,.55)}
+#moneyTab.active{background:linear-gradient(135deg,#059669,#14b8a6);box-shadow:0 10px 22px -6px rgba(20,184,166,.55)}
+#withdrawTab.active{background:linear-gradient(135deg,#f97316,#ec4899);box-shadow:0 10px 22px -6px rgba(236,72,153,.55)}
+.hidden-section{display:none!important}
+
+/* CARD */
+.form-card{padding:34px;border-radius:28px;border:1.5px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#6366f1,#a855f7,#ec4899,#f97316) border-box;
+  box-shadow:0 2px 4px rgba(30,27,75,.04),0 20px 40px -10px rgba(30,27,75,.14),0 40px 80px -24px rgba(124,58,237,.35)}
+#moneySection{background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#14b8a6,#22c55e,#facc15) border-box;
+  box-shadow:0 20px 40px -10px rgba(30,27,75,.14),0 40px 80px -24px rgba(20,184,166,.4)}
+#withdrawSection{background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#f97316,#ec4899,#a855f7) border-box;
+  box-shadow:0 20px 40px -10px rgba(30,27,75,.14),0 40px 80px -24px rgba(236,72,153,.4)}
+.section-head{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+.section-head .icon-box{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px}
+.section-head h2{font-family:var(--serif);color:var(--ink);font-size:23px}
+.section-head p{color:#64748b;font-size:13px;margin-top:4px}
+.icon-money{background:linear-gradient(135deg,#059669,#14b8a6);box-shadow:0 12px 22px -6px rgba(20,184,166,.5)}
+.icon-withdraw{background:linear-gradient(135deg,#f97316,#ec4899);box-shadow:0 12px 22px -6px rgba(236,72,153,.5)}
+
+/* NOTIFICATIONS */
+#message,#moneyMessage,#withdrawMessage{display:none;align-items:center;gap:14px;margin-bottom:22px;padding:16px 20px;border-radius:18px;
+  font-weight:600;font-size:14px;text-align:left;line-height:1.5;animation:messageSlideIn .35s ease}
+.success{display:flex!important;background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:#065f46;border:1px solid #86efac;box-shadow:0 12px 26px rgba(16,185,129,.18)}
+.error{display:flex!important;background:linear-gradient(135deg,#fff1f2,#fee2e2);color:#991b1b;border:1px solid #fca5a5;box-shadow:0 12px 26px rgba(225,29,72,.14)}
+.message-icon{width:40px;height:40px;min-width:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;
+  font-weight:800;color:#fff;background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 6px 14px rgba(16,185,129,.3)}
+.error .message-icon{background:linear-gradient(135deg,#e11d48,#f43f5e);box-shadow:0 6px 14px rgba(225,29,72,.25)}
+.message-content{display:flex;flex-direction:column;gap:3px}
+.message-title{font-size:15px;font-weight:800}
+.message-description{font-size:13px;font-weight:500;opacity:.9}
+@keyframes messageSlideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+/* FIELDS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:20px}
+.form-group{display:flex;flex-direction:column;min-width:0}
+label{color:var(--ink);font-weight:700;margin-bottom:8px;font-size:14px}
+input,select,textarea{width:100%;padding:14px 16px;border:1.5px solid #e5e7f5;border-radius:14px;outline:none;font-size:15px;
+  background:#f8f9ff;color:#334155;transition:.2s}
+input:hover,select:hover,textarea:hover{border-color:#c4b5fd}
+input:focus,select:focus,textarea:focus{border-color:#7c3aed;background:#fff;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+input::placeholder,textarea::placeholder{color:#a8b0c4}
+input[readonly]{background:#f1f5f9;color:#475569;font-weight:800;cursor:default}
+textarea{resize:vertical;min-height:100px;line-height:1.7}
+.full-width{margin-bottom:20px}
+.date-input-wrap{position:relative;width:100%}
+.date-input-wrap #entryDate{padding-right:54px}
+.calendar-btn{position:absolute;top:50%;right:9px;transform:translateY(-50%);width:36px;height:36px;border:0;border-radius:11px;
+  background:linear-gradient(135deg,#ede9fe,#fce7f3);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.calendar-btn:hover{transform:translateY(-50%) scale(1.08)}
+.hidden-date-picker{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;left:0;bottom:0}
+
+/* DIRECTION */
+.direction-container{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:6px}
+.direction-option input{display:none}
+.direction-option label{display:block;text-align:center;padding:18px 14px;border-radius:20px;cursor:pointer;background:#faf9ff;color:#475569;
+  border:2px solid #ece9ff;margin:0;font-weight:800;letter-spacing:.5px;transition:.25s}
+.direction-option label:hover{transform:translateY(-3px);box-shadow:0 12px 22px -8px rgba(30,27,75,.18)}
+.direction-option.long input:checked + label{background:linear-gradient(135deg,#ecfdf5,#f0fdfa);color:#047857;border-color:#34d399;
+  box-shadow:0 14px 28px -10px rgba(16,185,129,.55)}
+.direction-option.short input:checked + label{background:linear-gradient(135deg,#fff1f2,#fff7ed);color:#be123c;border-color:#fb7185;
+  box-shadow:0 14px 28px -10px rgba(244,63,94,.55)}
+#directionHint{margin-top:12px!important;padding:12px 16px;border-radius:14px;background:linear-gradient(135deg,#eff6ff,#f5f3ff);
+  border:1px solid #dbeafe;color:#475569!important;line-height:1.6}
+#directionHint::before{content:"💡 "}
+
+/* PNL */
+.pnl-preview{padding:16px 20px;border-radius:18px;background:linear-gradient(135deg,#f5f3ff,#fdf2f8);border:1px solid #e9d5ff;
+  border-left:6px solid #a855f7;color:#5b21b6;font-weight:800;font-size:15px;margin-bottom:22px;box-shadow:0 10px 22px -10px rgba(124,58,237,.35)}
+.pnl-preview::before{content:"📊 "}
+
+/* BUTTONS */
+.save-btn{width:100%;padding:17px;border:none;border-radius:999px;background:var(--brand);color:#fff;font-size:16px;font-weight:800;
+  cursor:pointer;transition:.3s;box-shadow:0 12px 26px -6px rgba(124,58,237,.5)}
+#addMoneyButton{background:linear-gradient(135deg,#059669,#14b8a6);box-shadow:0 12px 26px -6px rgba(20,184,166,.5)}
+#withdrawButton{background:linear-gradient(135deg,#f97316,#ec4899);box-shadow:0 12px 26px -6px rgba(236,72,153,.5)}
+.save-btn:hover{transform:translateY(-3px);box-shadow:0 18px 32px -6px rgba(30,27,75,.35)}
+.save-btn:active{transform:scale(.98)}
+.save-btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+
+@media (max-width:700px){
+  .form-row,.direction-container{grid-template-columns:1fr;gap:18px}
+  .header{padding:12px 18px}
+  .topbar-brand{font-size:23px}
+  .container{width:94%;margin:26px auto 50px}
+  .hero{padding:30px 24px}
+  .hero .f1,.hero .f3{display:none}
+  .hero .f4{font-size:44px;right:18px;bottom:18px}
+  .hero .f2{font-size:30px;right:18px;top:16px}
+  .title h1{font-size:28px}
+  .form-card{padding:24px 18px}
+  .form-toggle{gap:4px;padding:6px}
+  .toggle-btn{padding:12px 4px;font-size:11.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+    <div class="topbar-logo">
+        <div class="logo-icon">
+            <div class="logo-f">F</div>
+            <div class="logo-leaf"></div>
+        </div>
+
+        <div class="topbar-brand">FIN<span>OVA</span></div>
+    </div>
+
+    <button type="button" class="back-btn"
+            onclick="window.location.href='/finova/api/v1/recent-trades'">
+        ← Recent Trades
+    </button>
+</header>
+
+<main class="container">
+
+    <section class="hero title">
+        <span class="float f1">🐂</span><span class="float f2">💹</span><span class="float f3">🐻</span><span class="float f4">📈</span>
+        <div class="badge">✨ Trading Journal</div>
+        <h1>📈 Trade &amp; Fund Manager</h1>
+        <p>Record your trading activity and track your trade details</p>
+    </section>
+
+    <div class="form-toggle">
+        <button type="button" id="tradeTab" class="toggle-btn active" onclick="showSection('trade')">📈 Add Trade</button>
+        <button type="button" id="moneyTab" class="toggle-btn" onclick="showSection('money')">💰 Deposit Money</button>
+        <button type="button" id="withdrawTab" class="toggle-btn" onclick="showSection('withdraw')">↗ Withdraw Money</button>
+    </div>
+
+    <!-- ADD TRADE SECTION -->
+
+    <div class="form-card" id="tradeSection">
+
+        <div id="message" role="status" aria-live="polite"></div>
+
+        <div class="full-width">
+            <label>🧭 Trade Direction</label>
+
+            <div class="direction-container">
+                <div class="direction-option long">
+                    <input type="radio" id="longDirection" name="direction" value="LONG" checked>
+                    <label for="longDirection">🟢 LONG</label>
+                </div>
+
+                <div class="direction-option short">
+                    <input type="radio" id="shortDirection" name="direction" value="SHORT">
+                    <label for="shortDirection">🔴 SHORT</label>
+                </div>
+            </div>
+            <div id="directionHint" style="margin-top:10px; color:#64748b; font-size:13px; font-weight:600;">
+                LONG: BUY first, then SELL to exit.
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="market">🌐 Market</label>
+                <select id="market" required>
+                    <option value="EQUITY">Equity</option>
+                    <option value="FNO">Futures &amp; Options</option>
+                    <option value="COMMODITY">Commodity</option>
+                    <option value="CURRENCY">Currency</option>
+                    <option value="CRYPTO">Crypto</option>
+                    <option value="FOREX">Forex</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="symbol">🔤 Symbol</label>
+                <input type="text" id="symbol" placeholder="e.g. NIFTY, RELIANCE" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="productType">⏱️ Product Type</label>
+                <select id="productType" required>
+                    <option value="INTRADAY">Intraday</option>
+                    <option value="SCALPING">Scalping</option>
+                    <option value="DELIVERY">Delivery</option>
+                    <option value="SWING">Swing Trading</option>
+                    <option value="POSITIONAL">Positional</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="instrumentType">🧩 Instrument Type</label>
+                <select id="instrumentType" required>
+                    <option value="STOCK">Stock</option>
+                    <option value="FUTURES">Futures</option>
+                    <option value="OPTION">Option</option>
+                    <option value="ETF">ETF</option>
+                    <option value="CRYPTO">Crypto</option>
+                    <option value="FOREX">Forex</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="entryDate">📅 Entry Date</label>
+
+                <div class="date-input-wrap">
+                    <input type="text"
+                           id="entryDate"
+                           placeholder="dd/mm/yyyy"
+                           inputmode="numeric"
+                           maxlength="10"
+                           pattern="\d{2}/\d{2}/\d{4}"
+                           title="Enter date in dd/mm/yyyy format"
+                           autocomplete="off"
+                           required>
+
+                    <button type="button"
+                            class="calendar-btn"
+                            id="entryDateCalendarButton"
+                            aria-label="Choose entry date"
+                            title="Choose date">📅</button>
+
+                    <input type="date"
+                           id="entryDatePicker"
+                           class="hidden-date-picker"
+                           aria-label="Calendar date picker"
+                           tabindex="-1">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="entryTime">🕒 Entry Time</label>
+                <input type="time" id="entryTime" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="entryPrice" id="entryPriceLabel">Entry Price (BUY)</label>
+                <input type="number" id="entryPrice" placeholder="e.g. 250.50" min="0" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label for="exitPrice" id="exitPriceLabel">Exit Price (SELL)</label>
+                <input type="number" id="exitPrice" placeholder="Leave blank while trade is open" min="0" step="0.01">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="quantity">📦 Quantity / Lot Size</label>
+                <input type="number" id="quantity" placeholder="e.g. 50" min="1" step="1" value="1" required>
+            </div>
+
+            <div class="form-group">
+                <label for="currency">💱 Currency</label>
+                <select id="currency" required>
+                    <option value="INR" selected>₹ INR</option>
+                    <option value="USD">$ USD</option>
+                    <option value="AED">د.إ AED</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="stopLoss">🛑 Stop Loss</label>
+                <input type="number" id="stopLoss" placeholder="Optional" min="0" step="0.01">
+            </div>
+
+            <div class="form-group">
+                <label for="targetPrice">🎯 Target Price</label>
+                <input type="number" id="targetPrice" placeholder="Optional" min="0" step="0.01">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="brokerage">🧾 Brokerage / Charges</label>
+                <input type="number" id="brokerage" placeholder="e.g. 20" min="0" step="0.01" value="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="netProfitLoss">💹 Net Profit / Loss</label>
+                <input type="text" id="netProfitLoss" placeholder="Calculated when Exit Price is entered" readonly>
+            </div>
+        </div>
+
+        <div class="pnl-preview" id="pnlPreview">
+            Net P/L will be calculated when you enter an Exit Price.
+        </div>
+
+        <div class="full-width">
+            <div class="form-group">
+                <label for="description">🗒️ Description</label>
+                <textarea id="description" placeholder="Enter trade details, reason for entry, or notes..."></textarea>
+            </div>
+        </div>
+
+        <button type="button" id="saveButton" class="save-btn" onclick="saveTrade()">💾 Save Trade</button>
+
+    </div>
+
+    <!-- ADD MONEY SECTION -->
+
+    <div class="form-card hidden-section" id="moneySection">
+
+        <div class="section-head">
+            <div class="icon-box icon-money">💰</div>
+            <div>
+                <h2>Add Money to Broker</h2>
+                <p>Record funds deposited into your trading account.</p>
+            </div>
+        </div>
+
+        <div id="moneyMessage" role="status" aria-live="polite"></div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="brokerName">🏦 Broker</label>
+                <select id="brokerName" required>
+                    <option value="ANGEL_ONE">Angel One</option>
+                    <option value="GROWW">Groww</option>
+                    <option value="ZERODHA">Zerodha</option>
+                    <option value="UPSTOX">Upstox</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="depositAmount">💵 Deposit Amount (₹)</label>
+                <input type="number" id="depositAmount" placeholder="Enter amount" min="0.01" step="0.01" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="paymentApp">📲 Payment Application</label>
+                <select id="paymentApp">
+                    <option value="PHONEPE">PhonePe</option>
+                    <option value="GOOGLE_PAY">Google Pay</option>
+                    <option value="PAYTM">Paytm</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="paymentMode">💳 Payment Mode</label>
+                <select id="paymentMode">
+                    <option value="UPI">UPI</option>
+                    <option value="NET_BANKING">Net Banking</option>
+                    <option value="IMPS">Card Payment</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="depositDate">📅 Transaction Date</label>
+                <input type="datetime-local" id="depositDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="depositRemarks">🗒️ Remarks</label>
+                <textarea id="depositRemarks" placeholder="Enter deposit details..."></textarea>
+            </div>
+        </div>
+
+        <button type="button" class="save-btn" id="addMoneyButton" onclick="addMoney()">💰 Add Money</button>
+
+    </div>
+
+    <!-- WITHDRAW MONEY SECTION -->
+
+    <div class="form-card hidden-section" id="withdrawSection">
+
+        <div class="section-head">
+            <div class="icon-box icon-withdraw">↗</div>
+            <div>
+                <h2>Withdraw Money from Broker</h2>
+                <p>Record funds withdrawn from your trading account.</p>
+            </div>
+        </div>
+
+        <div id="withdrawMessage" role="status" aria-live="polite"></div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="withdrawBrokerName">🏦 Broker</label>
+                <select id="withdrawBrokerName" required>
+                    <option value="ANGEL_ONE">Angel One</option>
+                    <option value="GROWW">Groww</option>
+                    <option value="ZERODHA">Zerodha</option>
+                    <option value="UPSTOX">Upstox</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="withdrawAmount">💵 Withdrawal Amount (₹)</label>
+                <input type="number" id="withdrawAmount" placeholder="Enter amount" min="0.01" step="0.01" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="withdrawDate">📅 Transaction Date</label>
+                <input type="datetime-local" id="withdrawDate" required>
+            </div>
+
+            <div class="form-group">
+                <label for="withdrawRemarks">🗒️ Remarks</label>
+                <textarea id="withdrawRemarks" placeholder="Enter withdrawal details..."></textarea>
+            </div>
+        </div>
+
+        <button type="button" class="save-btn" id="withdrawButton" onclick="withdrawMoney()">↗ Withdraw Money</button>
+
+    </div>
+
+</main>
+
+<script>
+
+    // NOTIFICATION TIMERS
+    // Each notification has its own timer.
+    // Notifications disappear automatically after 3 seconds.
+
+    const messageTimers = new WeakMap();
+
+    function hideMessageAfterFiveSeconds(messageElement) {
+
+        clearTimeout(messageTimers.get(messageElement));
+
+        const timer = setTimeout(function () {
+            messageElement.style.display = "none";
+            messageElement.className = "";
+            messageElement.innerHTML = "";
+            messageTimers.delete(messageElement);
+        }, 3000);
+
+        messageTimers.set(messageElement, timer);
+    }
+
+    // DATE UTILITIES
+
+    function formatDateDisplay(date) {
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const year = date.getFullYear();
+
+        return day + "/" + month + "/" + year;
+    }
+
+    function toIsoDate(displayDate) {
+        const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(displayDate);
+
+        if (!match) {
+            return null;
+        }
+
+        const day = Number(match[1]);
+        const month = Number(match[2]);
+        const year = Number(match[3]);
+
+        const date = new Date(year, month - 1, day);
+
+        if (
+            date.getFullYear() !== year ||
+            date.getMonth() !== month - 1 ||
+            date.getDate() !== day
+        ) {
+            return null;
+        }
+
+        return year + "-" +
+            String(month).padStart(2, "0") + "-" +
+            String(day).padStart(2, "0");
+    }
+
+    function getValue(id) {
+        const element = document.getElementById(id);
+        return element ? element.value.trim() : "";
+    }
+
+    function numberOrNull(id) {
+        const value = getValue(id);
+
+        if (value === "") {
+            return null;
+        }
+
+        const number = Number(value);
+        return Number.isFinite(number) ? number : null;
+    }
+
+    // DATE PICKER
+
+    const entryDateInput = document.getElementById("entryDate");
+    const entryDatePicker = document.getElementById("entryDatePicker");
+
+    const entryDateCalendarButton =
+        document.getElementById("entryDateCalendarButton");
+
+    const entryTimeInput = document.getElementById("entryTime");
+
+    const now = new Date();
+
+    entryDateInput.value = formatDateDisplay(now);
+
+    entryTimeInput.value =
+        String(now.getHours()).padStart(2, "0") + ":" +
+        String(now.getMinutes()).padStart(2, "0");
+
+    function setDatePickerFromDisplayDate() {
+        const isoDate = toIsoDate(getValue("entryDate"));
+
+        if (isoDate) {
+            entryDatePicker.value = isoDate;
+        }
+    }
+
+    entryDateCalendarButton.addEventListener("click", function () {
+        setDatePickerFromDisplayDate();
+
+        if (typeof entryDatePicker.showPicker === "function") {
+            entryDatePicker.showPicker();
+        } else {
+            entryDatePicker.focus();
+            entryDatePicker.click();
+        }
+    });
+
+    entryDatePicker.addEventListener("change", function () {
+        if (!this.value) {
+            return;
+        }
+
+        const parts = this.value.split("-");
+
+        entryDateInput.value =
+            parts[2] + "/" + parts[1] + "/" + parts[0];
+    });
+
+    entryDateInput.addEventListener("input", function () {
+        const digits = this.value.replace(/\D/g, "").slice(0, 8);
+
+        if (digits.length >= 5) {
+            this.value =
+                digits.slice(0, 2) + "/" +
+                digits.slice(2, 4) + "/" +
+                digits.slice(4);
+        } else if (digits.length >= 3) {
+            this.value =
+                digits.slice(0, 2) + "/" +
+                digits.slice(2);
+        } else {
+            this.value = digits;
+        }
+    });
+
+    // COMMON PREMIUM NOTIFICATION FUNCTION
+
+    function showTransactionMessage(messageElement, title, description, type) {
+
+        clearTimeout(messageTimers.get(messageElement));
+
+        const isSuccess = type === "success";
+
+        messageElement.innerHTML = `
+            <div class="message-icon">
+                ${isSuccess ? "✓" : "!"}
+            </div>
+
+            <div class="message-content">
+                <div class="message-title">${title}</div>
+                <div class="message-description"></div>
+            </div>
+        `;
+
+        messageElement.querySelector(".message-description").textContent =
+            description;
+
+        messageElement.className = type;
+        messageElement.style.display = "flex";
+
+        messageElement.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+
+        hideMessageAfterFiveSeconds(messageElement);
+    }
+
+    // ADD TRADE MESSAGE
+
+    function showMessage(messageText, type) {
+
+        const message = document.getElementById("message");
+
+        clearTimeout(messageTimers.get(message));
+
+        const isSuccess = type === "success";
+
+        message.innerHTML = `
+            <div class="message-icon">
+                ${isSuccess ? "✓" : "!"}
+            </div>
+
+            <div class="message-content">
+                <div class="message-title">
+                    ${isSuccess ? "Trade Saved Successfully!" : "Trade Failed!"}
+                </div>
+
+                <div class="message-description"></div>
+            </div>
+        `;
+
+        message.querySelector(".message-description").textContent =
+            messageText;
+
+        message.className = type;
+        message.style.display = "flex";
+
+        message.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+
+        hideMessageAfterFiveSeconds(message);
+    }
+
+    // TRADE DIRECTION LABELS
+    // LONG  = BUY first, SELL later
+    // SHORT = SELL first, BUY later
+
+    function updateDirectionLabels() {
+        const directionElement = document.querySelector(
+            'input[name="direction"]:checked'
+        );
+
+        const direction = directionElement ? directionElement.value : "LONG";
+        const entryLabel = document.getElementById("entryPriceLabel");
+        const exitLabel = document.getElementById("exitPriceLabel");
+        const hint = document.getElementById("directionHint");
+
+        if (direction === "SHORT") {
+            entryLabel.textContent = "Entry Price (SELL first)";
+            exitLabel.textContent = "Exit Price (BUY to close)";
+            hint.textContent = "SHORT: SELL first at entry, then BUY back at exit. Profit when the exit price is lower.";
+        } else {
+            entryLabel.textContent = "Entry Price (BUY first)";
+            exitLabel.textContent = "Exit Price (SELL to close)";
+            hint.textContent = "LONG: BUY first at entry, then SELL at exit. Profit when the exit price is higher.";
+        }
+
+        calculateNetProfitLoss();
+    }
+
+    // PROFIT / LOSS CALCULATION
+
+    function calculateNetProfitLoss() {
+
+        const entryPrice = numberOrNull("entryPrice");
+        const exitPrice = numberOrNull("exitPrice");
+        const quantity = numberOrNull("quantity");
+        const brokerage = numberOrNull("brokerage");
+
+        // Optional contract multiplier field; defaults to 1 when not present.
+        const multiplier = numberOrNull("contractMultiplier") ?? 1;
+
+        const pnlInput = document.getElementById("netProfitLoss");
+        const pnlPreview = document.getElementById("pnlPreview");
+
+        if (
+            entryPrice === null ||
+            exitPrice === null ||
+            quantity === null ||
+            brokerage === null
+        ) {
+            pnlInput.value = "";
+
+            pnlPreview.textContent =
+                "Net P/L will be calculated when you enter an Exit Price.";
+
+            pnlPreview.style.color = "#5b21b6";
+
+            return null;
+        }
+
+        const directionElement = document.querySelector(
+            'input[name="direction"]:checked'
+        );
+        const direction = directionElement ? directionElement.value : "LONG";
+
+        let grossProfitLoss;
+
+        if (direction === "LONG") {
+            // LONG: BUY at entry, SELL at exit.
+            grossProfitLoss = (exitPrice - entryPrice) * quantity * multiplier;
+        } else {
+            // SHORT: SELL at entry, BUY at exit. Reverse the LONG calculation.
+            grossProfitLoss = (entryPrice - exitPrice) * quantity * multiplier;
+        }
+
+        // Deduct brokerage and charges
+        const netProfitLoss = grossProfitLoss - brokerage;
+
+        const roundedPnl = Number(netProfitLoss.toFixed(2));
+
+        pnlInput.value = roundedPnl.toFixed(2);
+
+        pnlPreview.textContent =
+            (roundedPnl >= 0 ? "Net Profit: +" : "Net Loss: ") +
+            roundedPnl.toFixed(2) +
+            " | Brokerage deducted: " +
+            brokerage.toFixed(2);
+
+        pnlPreview.style.color =
+            roundedPnl > 0 ? "#166534" :
+            roundedPnl < 0 ? "#991b1b" : "#5b21b6";
+
+        return roundedPnl;
+    }
+
+
+    [
+        "entryPrice",
+        "exitPrice",
+        "quantity",
+        "brokerage"
+    ].forEach(function (id) {
+        document.getElementById(id).addEventListener(
+            "input",
+            calculateNetProfitLoss
+        );
+    });
+
+    document.querySelectorAll('input[name="direction"]').forEach(function (radio) {
+        radio.addEventListener("change", updateDirectionLabels);
+    });
+
+    // Initialize the correct BUY / SELL labels on page load.
+    updateDirectionLabels();
+
+    // SAVE TRADE
+
+    async function saveTrade() {
+
+        const saveButton = document.getElementById("saveButton");
+
+        if (saveButton.disabled) {
+            return;
+        }
+
+        const directionElement =
+            document.querySelector('input[name="direction"]:checked');
+
+        const market = getValue("market");
+        const symbol = getValue("symbol");
+        const productType = getValue("productType");
+        const instrumentType = getValue("instrumentType");
+
+        const direction = directionElement ? directionElement.value : "";
+
+        const entryDate = toIsoDate(getValue("entryDate"));
+        const entryTime = getValue("entryTime");
+
+        const entryPrice = numberOrNull("entryPrice");
+        const exitPrice = numberOrNull("exitPrice");
+        const quantity = numberOrNull("quantity");
+
+        const contractMultiplier =
+            numberOrNull("contractMultiplier") ?? 1;
+
+        const stopLoss = numberOrNull("stopLoss");
+        const targetPrice = numberOrNull("targetPrice");
+        const brokerage = numberOrNull("brokerage");
+
+        if (!market) {
+            showMessage("Please select Market.", "error");
+            return;
+        }
+
+        if (!symbol) {
+            showMessage("Please enter Symbol.", "error");
+            return;
+        }
+
+        if (!productType) {
+            showMessage("Please select Product Type.", "error");
+            return;
+        }
+
+        if (!instrumentType) {
+            showMessage("Please select Instrument Type.", "error");
+            return;
+        }
+
+        if (direction !== "LONG" && direction !== "SHORT") {
+            showMessage("Please select LONG or SHORT.", "error");
+            return;
+        }
+
+        if (!entryDate) {
+            showMessage(
+                "Please enter a valid Entry Date in dd/mm/yyyy format.",
+                "error"
+            );
+            return;
+        }
+
+        if (!entryTime) {
+            showMessage("Please enter Entry Time.", "error");
+            return;
+        }
+
+        if (entryPrice === null || entryPrice <= 0) {
+            showMessage("Entry Price must be greater than 0.", "error");
+            return;
+        }
+
+        if (quantity === null || quantity <= 0) {
+            showMessage("Quantity must be greater than 0.", "error");
+            return;
+        }
+
+        if (exitPrice !== null && exitPrice <= 0) {
+            showMessage("Exit Price must be greater than 0.", "error");
+            return;
+        }
+
+        if (brokerage === null || brokerage < 0) {
+            showMessage("Brokerage cannot be negative.", "error");
+            return;
+        }
+
+        if (stopLoss !== null && stopLoss <= 0) {
+            showMessage("Stop Loss must be greater than 0.", "error");
+            return;
+        }
+
+        if (targetPrice !== null && targetPrice <= 0) {
+            showMessage("Target Price must be greater than 0.", "error");
+            return;
+        }
+
+        // Validate Stop Loss and Target according to the selected direction.
+        // LONG: SL below entry and target above entry.
+        // SHORT: SL above entry and target below entry.
+        if (direction === "LONG") {
+            if (stopLoss !== null && stopLoss >= entryPrice) {
+                showMessage("For a LONG trade, Stop Loss must be below Entry Price.", "error");
+                return;
+            }
+            if (targetPrice !== null && targetPrice <= entryPrice) {
+                showMessage("For a LONG trade, Target Price must be above Entry Price.", "error");
+                return;
+            }
+        } else {
+            if (stopLoss !== null && stopLoss <= entryPrice) {
+                showMessage("For a SHORT trade, Stop Loss must be above Entry Price.", "error");
+                return;
+            }
+            if (targetPrice !== null && targetPrice >= entryPrice) {
+                showMessage("For a SHORT trade, Target Price must be below Entry Price.", "error");
+                return;
+            }
+        }
+
+        const netProfitLoss = calculateNetProfitLoss();
+
+        const status = exitPrice !== null ? "CLOSED" : "OPEN";
+
+        const payload = {
+            market: market,
+            symbol: symbol,
+            productType: productType,
+            instrumentType: instrumentType,
+            // Keep LONG / SHORT in the API payload. Entry/exit prices are
+            // interpreted according to the direction selected above.
+            direction: direction,
+            entryDate: entryDate,
+            entryTime: entryTime,
+            entryPrice: entryPrice,
+            exitPrice: exitPrice,
+            quantity: quantity,
+            contractMultiplier: contractMultiplier,
+            stopLoss: stopLoss,
+            targetPrice: targetPrice,
+            brokerage: String(brokerage),
+            broker: getValue("broker") || null,
+            currency: getValue("currency") || "INR",
+            description: getValue("description") || null,
+            netProfitLoss: netProfitLoss === null
+                ? null
+                : netProfitLoss.toFixed(2),
+            status: status
+        };
+
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving Trade...";
+
+        try {
+
+            const response = await fetch("/finova/api/v1/trades", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(
+                    data.INFORMATION ||
+                    data.message ||
+                    "Unable to save trade. Please check the entered details."
+                );
+            }
+
+            if (
+                data.RESP_STATUS &&
+                !["SUCCESS", "SUCCESSFUL"].includes(
+                    String(data.RESP_STATUS).toUpperCase()
+                )
+            ) {
+                throw new Error(
+                    data.INFORMATION || "Trade could not be saved."
+                );
+            }
+
+            showMessage(
+                "Your trade details have been saved successfully.",
+                "success"
+            );
+
+            // RESET FORM AFTER SUCCESSFUL SAVE
+
+            document.getElementById("market").value = "EQUITY";
+            document.getElementById("symbol").value = "";
+            document.getElementById("productType").value = "INTRADAY";
+            document.getElementById("instrumentType").value = "STOCK";
+            document.getElementById("longDirection").checked = true;
+            updateDirectionLabels();
+
+            document.getElementById("entryDate").value =
+                formatDateDisplay(new Date());
+
+            const resetTime = new Date();
+
+            document.getElementById("entryTime").value =
+                String(resetTime.getHours()).padStart(2, "0") + ":" +
+                String(resetTime.getMinutes()).padStart(2, "0");
+
+            entryDatePicker.value = "";
+
+            document.getElementById("entryPrice").value = "";
+            document.getElementById("exitPrice").value = "";
+            document.getElementById("quantity").value = "1";
+            document.getElementById("stopLoss").value = "";
+            document.getElementById("targetPrice").value = "";
+            document.getElementById("brokerage").value = "0";
+            document.getElementById("currency").value = "INR";
+            document.getElementById("description").value = "";
+            document.getElementById("netProfitLoss").value = "";
+
+            document.getElementById("pnlPreview").textContent =
+                "Net P/L will be calculated when you enter an Exit Price.";
+
+            document.getElementById("pnlPreview").style.color = "#5b21b6";
+
+        } catch (error) {
+
+            console.error("Save Trade Error:", error);
+
+            showMessage(error.message, "error");
+
+        } finally {
+
+            saveButton.disabled = false;
+            saveButton.textContent = "💾 Save Trade";
+        }
+    }
+
+    // SWITCH BETWEEN SECTIONS
+
+    function showSection(section) {
+
+        const sections = {
+            trade: document.getElementById("tradeSection"),
+            money: document.getElementById("moneySection"),
+            withdraw: document.getElementById("withdrawSection")
+        };
+
+        const tabs = {
+            trade: document.getElementById("tradeTab"),
+            money: document.getElementById("moneyTab"),
+            withdraw: document.getElementById("withdrawTab")
+        };
+
+        Object.keys(sections).forEach(function (key) {
+
+            sections[key].classList.toggle(
+                "hidden-section",
+                key !== section
+            );
+
+            tabs[key].classList.toggle(
+                "active",
+                key === section
+            );
+        });
+    }
+
+    // SET CURRENT DEPOSIT DATE AND TIME
+
+    function setCurrentDepositDateTime() {
+
+        const now = new Date();
+
+        const localDateTime =
+            now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, "0") + "-" +
+            String(now.getDate()).padStart(2, "0") + "T" +
+            String(now.getHours()).padStart(2, "0") + ":" +
+            String(now.getMinutes()).padStart(2, "0");
+
+        document.getElementById("depositDate").value = localDateTime;
+    }
+
+    setCurrentDepositDateTime();
+
+    // SET CURRENT WITHDRAWAL DATE AND TIME
+
+    function setCurrentWithdrawalDateTime() {
+
+        const now = new Date();
+
+        const localDateTime =
+            now.getFullYear() + "-" +
+            String(now.getMonth() + 1).padStart(2, "0") + "-" +
+            String(now.getDate()).padStart(2, "0") + "T" +
+            String(now.getHours()).padStart(2, "0") + ":" +
+            String(now.getMinutes()).padStart(2, "0");
+
+        document.getElementById("withdrawDate").value = localDateTime;
+    }
+
+    setCurrentWithdrawalDateTime();
+
+    // ADD MONEY
+
+    async function addMoney() {
+
+        const button = document.getElementById("addMoneyButton");
+        const message = document.getElementById("moneyMessage");
+
+        if (button.disabled) {
+            return;
+        }
+
+        const amountValue =
+            document.getElementById("depositAmount").value.trim();
+
+        const amount = Number(amountValue);
+
+        const transactionDate =
+            document.getElementById("depositDate").value;
+
+        message.className = "";
+        message.style.display = "none";
+
+        if (!amountValue || !Number.isFinite(amount) || amount <= 0) {
+
+            showTransactionMessage(
+                message,
+                "Invalid Deposit Amount",
+                "Please enter a valid deposit amount greater than zero.",
+                "error"
+            );
+
+            return;
+        }
+
+        if (!transactionDate) {
+
+            showTransactionMessage(
+                message,
+                "Transaction Date Required",
+                "Please select transaction date and time.",
+                "error"
+            );
+
+            return;
+        }
+
+        const payload = {
+            txnType: "DEPOSITE",
+            brokerName: document.getElementById("brokerName").value,
+            amount: amount,
+            transactionDate: transactionDate,
+            paymentMode: document.getElementById("paymentMode").value,
+            paymentApp: document.getElementById("paymentApp").value,
+            remarks: document.getElementById("depositRemarks").value.trim() || null
+        };
+
+        button.disabled = true;
+        button.textContent = "Saving Deposit...";
+
+        try {
+
+            const response = await fetch("/finova/api/v1/trading/fund", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(
+                    data.INFORMATION ||
+                    data.message ||
+                    "Unable to save deposit."
+                );
+            }
+
+            if (
+                data.RESP_STATUS &&
+                !["SUCCESS", "SUCCESSFUL"].includes(
+                    String(data.RESP_STATUS).toUpperCase()
+                )
+            ) {
+                throw new Error(
+                    data.INFORMATION || "Deposit could not be saved."
+                );
+            }
+
+            showTransactionMessage(
+                message,
+                "Money Added Successfully!",
+                "Your deposit has been recorded successfully in your trading account.",
+                "success"
+            );
+
+            document.getElementById("depositAmount").value = "";
+            document.getElementById("depositRemarks").value = "";
+
+            setCurrentDepositDateTime();
+
+        } catch (error) {
+
+            console.error("Add Money Error:", error);
+
+            showTransactionMessage(
+                message,
+                "Deposit Failed!",
+                error.message,
+                "error"
+            );
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "💰 Add Money";
+        }
+    }
+
+    // WITHDRAW MONEY
+
+    async function withdrawMoney() {
+
+        const button = document.getElementById("withdrawButton");
+        const message = document.getElementById("withdrawMessage");
+
+        if (button.disabled) {
+            return;
+        }
+
+        const amountValue =
+            document.getElementById("withdrawAmount").value.trim();
+
+        const amount = Number(amountValue);
+
+        const transactionDate =
+            document.getElementById("withdrawDate").value;
+
+        message.className = "";
+        message.style.display = "none";
+
+        if (!amountValue || !Number.isFinite(amount) || amount <= 0) {
+
+            showTransactionMessage(
+                message,
+                "Invalid Withdrawal Amount",
+                "Please enter a valid withdrawal amount greater than zero.",
+                "error"
+            );
+
+            return;
+        }
+
+        if (!transactionDate) {
+
+            showTransactionMessage(
+                message,
+                "Transaction Date Required",
+                "Please select transaction date and time.",
+                "error"
+            );
+
+            return;
+        }
+
+        const payload = {
+            txnType: "WITHDRWAL",
+            brokerName: document.getElementById("withdrawBrokerName").value,
+            amount: amount,
+            transactionDate: transactionDate,
+            remarks: document.getElementById("withdrawRemarks").value.trim() || null
+        };
+
+        button.disabled = true;
+        button.textContent = "Saving Withdrawal...";
+
+        try {
+
+            const response = await fetch("/finova/api/v1/trading/fund", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(
+                    data.INFORMATION ||
+                    data.message ||
+                    "Unable to save withdrawal."
+                );
+            }
+
+            if (
+                data.RESP_STATUS &&
+                !["SUCCESS", "SUCCESSFUL"].includes(
+                    String(data.RESP_STATUS).toUpperCase()
+                )
+            ) {
+                throw new Error(
+                    data.INFORMATION || "Withdrawal could not be saved."
+                );
+            }
+
+            showTransactionMessage(
+                message,
+                "Withdrawal Successful!",
+                "Your withdrawal has been recorded successfully in your trading account.",
+                "success"
+            );
+
+            document.getElementById("withdrawAmount").value = "";
+            document.getElementById("withdrawRemarks").value = "";
+
+            setCurrentWithdrawalDateTime();
+
+        } catch (error) {
+
+            console.error("Withdraw Money Error:", error);
+
+            showTransactionMessage(
+                message,
+                "Withdrawal Failed!",
+                error.message,
+                "error"
+            );
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "↗ Withdraw Money";
+        }
+    }
+
+    // GLOBAL FUNCTIONS
+
+    window.showSection = showSection;
+    window.addMoney = addMoney;
+    window.withdrawMoney = withdrawMoney;
+    window.saveTrade = saveTrade;
+
+</script>
+
+</body>
+</html>
