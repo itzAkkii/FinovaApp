@@ -66,6 +66,21 @@ public class TransactionServiceImpl implements TransactionService {
 		}
 		return transactionRepository.getTotalExpense(year, month, userId);
 	}
+	
+	@Override
+	public BigDecimal getOverallBalance() {
+	    FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
+	            .orElseThrow(() -> {
+	                log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+	                return new FinovaException("MPAY1019", "Please login to access this service");
+	            });
+	    String userId = finovaUserDetails.getUserId();
+	    if (userId == null) {
+	        log.debug("[{}] ==> User Id is Null ::", httpSession.getId());
+	        throw new FinovaException("MPAY1019", "Internal issue! Please try later");
+	    }
+	    return transactionRepository.getOverallBalance(userId);
+	}
 
 	/*
 	 * @Override public List<FinTransactionDetails> getRecentTransactions() {

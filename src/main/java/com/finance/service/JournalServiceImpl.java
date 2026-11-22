@@ -80,7 +80,10 @@ public class JournalServiceImpl implements JournalService {
 			finGoalDetails.setGoalId("FIN" + this.finUtils.dateFormat() + this.finUtils.generateRandomString(2));
 			finGoalDetails.setGoalTitle(journalEntryDetails.getTitle());
 			finGoalDetails.setGoal(journalEntryDetails.getSubject());
-			finGoalDetails.setAmount(journalEntryDetails.getAmount());
+			String initialAmount = Optional.ofNullable(journalEntryDetails.getAmount()).filter(a -> !a.isBlank())
+					.orElse("0");
+			finGoalDetails.setAmount(initialAmount);
+			finGoalDetails.setCurrentAmount(initialAmount);
 			finGoalDetails.setTargetAmount(journalEntryDetails.getTargetAmount());
 			finGoalDetails.setPriority(journalEntryDetails.getPriority());
 			finGoalDetails.setCurrency("INR");
@@ -110,9 +113,8 @@ public class JournalServiceImpl implements JournalService {
 					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
 					return new FinovaException("MPAY1019", "Please login to access this service");
 				});
-		log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
 
-		return Optional.ofNullable(this.finDiaryRepository.findAll()).filter(list -> !list.isEmpty())
+		return Optional.ofNullable(this.finDiaryRepository.findDiaryList(finovaUserDetails.getUserId())).filter(list -> !list.isEmpty())
 				.orElseThrow(() -> {
 					log.error("[{}] ==> Diary Not Found", httpSession.getId());
 					return new FinovaException("FIN1002", "No Diary Entries Found");
@@ -128,9 +130,8 @@ public class JournalServiceImpl implements JournalService {
 					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
 					return new FinovaException("MPAY1019", "Please login to access this service");
 				});
-		log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
 
-		return Optional.ofNullable(this.finGoalRepository.findAll()).filter(list -> !list.isEmpty()).orElseThrow(() -> {
+		return Optional.ofNullable(this.finGoalRepository.findGoalList(finovaUserDetails.getUserId())).filter(list -> !list.isEmpty()).orElseThrow(() -> {
 			log.error("[{}] ==> Goals Not Found", httpSession.getId());
 			return new FinovaException("FIN1002", "No Financial Goals Found");
 		});
@@ -293,20 +294,27 @@ public class JournalServiceImpl implements JournalService {
 			BigDecimal existingAmount = new BigDecimal(Optional.ofNullable(existingGoalDetails.getCurrentAmount())
 					.filter(amount -> !amount.isBlank()).orElse("0"));
 
-			BigDecimal addedAmount = new BigDecimal(finGoalDetails.getCurrentAmount());
-
-			if (addedAmount.compareTo(BigDecimal.ZERO) < 0) {
-				throw new FinovaException("FIN1002", "Added amount cannot be negative");
+			BigDecimal changeAmount = new BigDecimal(finGoalDetails.getCurrentAmount().trim());
+			BigDecimal updatedAmount = existingAmount.add(changeAmount);
+			if (updatedAmount.compareTo(BigDecimal.ZERO) < 0) {
+				throw new FinovaException("FIN1002", "Withdrawal cannot exceed the current amount");
 			}
 
-			BigDecimal updatedAmount = existingAmount.add(addedAmount);
+			String targetValue = Optional.ofNullable(finGoalDetails.getTargetAmount()).filter(t -> !t.isBlank())
+					.orElse(existingGoalDetails.getTargetAmount());
+
+			if (targetValue != null && !targetValue.isBlank()
+					&& updatedAmount.compareTo(new BigDecimal(targetValue)) > 0) {
+				throw new FinovaException("FIN1002", "Current amount cannot exceed target amount");
+			}
 			existingGoalDetails.setCurrentAmount(updatedAmount.stripTrailingZeros().toPlainString());
 		}
 
-		Optional.ofNullable(finGoalDetails.getTargetAmount()).ifPresent(existingGoalDetails::setTargetAmount);
+		Optional.ofNullable(finGoalDetails.getTargetAmount()).filter(amount -> !amount.isBlank())
+				.ifPresent(existingGoalDetails::setTargetAmount);
 		Optional.ofNullable(finGoalDetails.getTargetDate()).ifPresent(existingGoalDetails::setTargetDate);
 		Optional.ofNullable(finGoalDetails.getPriority()).ifPresent(existingGoalDetails::setPriority);
-		
+
 		existingGoalDetails.setDate(this.finUtils.getDate());
 		existingGoalDetails.setDateAndTime(this.finUtils.getDateAndTime());
 

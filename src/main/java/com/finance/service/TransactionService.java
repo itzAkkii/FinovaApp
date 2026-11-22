@@ -12,6 +12,8 @@ public interface TransactionService {
 
 	BigDecimal getTotalExpense(int year, int month);
 	
+	BigDecimal getOverallBalance();
+	
 //	public List<FinTransactionDetails> getRecentTransactions();
 
 	public FinTransactionDetails addExpense(TransactionDetails transactionDetails);

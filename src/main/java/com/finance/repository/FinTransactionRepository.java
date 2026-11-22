@@ -19,6 +19,9 @@ public interface FinTransactionRepository extends JpaRepository<FinTransactionDe
 	@Query(value = "SELECT COALESCE(SUM(CAST(AMOUNT AS NUMERIC)), 0) FROM FIN_TRANSACTION_DETAILS WHERE TRANSACTION_TYPE = 'EXPENSE' AND USER_ID = :userId AND EXTRACT(YEAR FROM TO_DATE(DATE, 'DD-MM-YYYY')) = :year AND EXTRACT(MONTH FROM TO_DATE(DATE, 'DD-MM-YYYY')) = :month", nativeQuery = true)
 	BigDecimal getTotalExpense(@Param("year") int year, @Param("month") int month, @Param("userId") String userId);
 
+	@Query(value = "SELECT COALESCE(SUM(CASE WHEN TRANSACTION_TYPE = 'INCOME' THEN CAST(AMOUNT AS NUMERIC) ELSE -CAST(AMOUNT AS NUMERIC) END), 0) FROM FIN_TRANSACTION_DETAILS WHERE USER_ID = :userId AND TRANSACTION_TYPE IN ('INCOME','EXPENSE')", nativeQuery = true)
+	BigDecimal getOverallBalance(@Param("userId") String userId);
+	
 //	@Query(value = "SELECT * FROM FIN_TRANSACTION_DETAILS ORDER BY TO_DATE(DATE, 'DD-MM-YYYY') DESC, TO_TIMESTAMP(DATETIME, 'DD-MM-YYYY HH24:MI:SS') DESC LIMIT 3", nativeQuery = true)
 //	List<FinTransactionDetails> findRecentTransactions();
 
@@ -34,21 +37,25 @@ public interface FinTransactionRepository extends JpaRepository<FinTransactionDe
 			@Param("fromDate") String fromDate, @Param("toDate") String toDate);
 
 	@Query(value = """
-			SELECT COALESCE(
-			    SUM(
-			        CASE
-			            WHEN TRANSACTION_TITLE = 'ADD Money'
-			                THEN CAST(AMOUNT AS NUMERIC)
-			            WHEN TRANSACTION_TITLE = 'Send Money'
-			                THEN -CAST(AMOUNT AS NUMERIC)
-			            ELSE 0
-			        END
-			    ), 0
-			)
-			FROM FIN_TRANSACTION_DETAILS
-			WHERE TRANSACTION_CATEGORY = 'Trading'
-			  AND STATUS = 'S'
-			""", nativeQuery = true)
-	BigDecimal getTradingCapital();
+		    SELECT COALESCE(
+		        SUM(
+		            CASE
+		                WHEN TRANSACTION_TITLE = 'ADD Money'
+		                    THEN CAST(AMOUNT AS NUMERIC)
+		                WHEN TRANSACTION_TITLE = 'Send Money'
+		                    THEN -CAST(AMOUNT AS NUMERIC)
+		                ELSE 0
+		            END
+		        ), 0
+		    )
+		    FROM FIN_TRANSACTION_DETAILS
+		    WHERE USER_ID = :userId
+		      AND TRANSACTION_CATEGORY = 'Trading'
+		      AND STATUS = 'S'
+		    """, nativeQuery = true)
+		BigDecimal getTradingCapital(@Param("userId") String userId);
+
+	@Query(value = "SELECT * FROM FIN_TRANSACTION_DETAILS WHERE USER_ID = :customerId AND EXTRACT(YEAR FROM TO_DATE(DATE, 'DD-MM-YYYY')) = :year AND EXTRACT(MONTH FROM TO_DATE(DATE, 'DD-MM-YYYY')) = :month ORDER BY TO_DATE(DATE, 'DD-MM-YYYY') DESC, TO_TIMESTAMP(DATETIME, 'DD-MM-YYYY HH24:MI:SS') DESC", nativeQuery = true)
+	List<FinTransactionDetails> getMonthlyReportByCustomer(@Param("customerId") String customerId, @Param("year") int year, @Param("month") int month);
 
 }

@@ -2,6 +2,7 @@ package com.finance.controller.rest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/customer")
 public class CustomerRestController {
 
+	private static final ZoneId APP_ZONE = ZoneId.of("Asia/Kolkata");
+
 	private final HttpSession httpSession;
 	private final CustomerService customerService;
 	private final TransactionService transactionService;
@@ -45,8 +48,7 @@ public class CustomerRestController {
 
 	@GetMapping("/session-expired")
 	public String sessionExpired() {
-
-	    return "session-expired";
+		return "session-expired";
 	}
 
 	@PostMapping("/validation")
@@ -66,9 +68,10 @@ public class CustomerRestController {
 			responseData.put("INFORMATION", "User Not Found");
 		}
 
+		log.info("[{}] ==> Final Response: {}", httpSession.getId(), responseData);
 		return ResponseEntity.status(HttpStatus.OK).headers(RestApiController.getHeaders()).body(responseData);
 	}
-	
+
 	@GetMapping("/register")
 	public String registerPage() {
 		return "register";
@@ -87,6 +90,7 @@ public class CustomerRestController {
 		responseData.put("USER_ID", registeredUser.getUserId());
 		responseData.put("DATA", registeredUser);
 
+		log.info("[{}] ==> Final Response: {}", httpSession.getId(), responseData);
 		return ResponseEntity.status(HttpStatus.OK).headers(RestApiController.getHeaders()).body(responseData);
 	}
 
@@ -109,6 +113,7 @@ public class CustomerRestController {
 		responseData.put("USER_ID", finovaUser.getUserId());
 		responseData.put("DATA", finovaUser);
 
+		log.info("[{}] ==> Final Response: {}", httpSession.getId(), responseData);
 		return ResponseEntity.status(HttpStatus.OK).headers(RestApiController.getHeaders()).body(responseData);
 	}
 
@@ -136,34 +141,35 @@ public class CustomerRestController {
 
 	@GetMapping("/home")
 	public String home(Model model) {
-		log.info("[{}] ==> Fetching Recent Transactions", httpSession.getId());
+		log.info("[{}] ==> Fetching monthly totals", httpSession.getId());
 
-		LocalDate currentDate = LocalDate.now();
-		int year = currentDate.getYear();
-		int month = currentDate.getMonthValue();
+		LocalDate today = LocalDate.now(APP_ZONE);
+		int year = today.getYear();
+		int month = today.getMonthValue();
 
-		// List<FinTransactionDetails> recentTransactions =
-		// transactionService.getRecentTransactions();
-		
 		try {
+			// Resets to 0 on the 1st of every month, then counts up as transactions are
 			BigDecimal totalIncome = transactionService.getTotalIncome(year, month);
 			BigDecimal totalExpense = transactionService.getTotalExpense(year, month);
-			BigDecimal balance = totalIncome.subtract(totalExpense);
 
-			// model.addAttribute("recentTransactions", recentTransactions);
+			// All months combined, so it carries forward
+			BigDecimal balance = transactionService.getOverallBalance();
+
 			model.addAttribute("totalIncome", totalIncome);
 			model.addAttribute("totalExpense", totalExpense);
 			model.addAttribute("balance", balance);
-
 			return "home";
-		} catch (Exception e) {
-			// TODO: handle exception
-			   log.error("[{}] ==> Session expired. Redirecting to login.",
-		                httpSession.getId());
+		} catch (FinovaException e) {
+			log.error("[{}] ==> {}. Redirecting to login.", httpSession.getId(), e.getMessage());
+			return "redirect:/customer/session-expired";
 
-		        return "redirect:/customer/session-expired";
+		} catch (Exception e) {
+			log.error("[{}] ==> Unable to load dashboard totals", httpSession.getId(), e);
+			model.addAttribute("totalIncome", BigDecimal.ZERO);
+			model.addAttribute("totalExpense", BigDecimal.ZERO);
+			model.addAttribute("balance", BigDecimal.ZERO);
+			return "home";
 		}
-	
 	}
 
 	@RequestMapping(value = "/info", method = RequestMethod.POST)
@@ -186,7 +192,6 @@ public class CustomerRestController {
 		responseData.put("address", userProfile.getAddress());
 
 		log.info("[{}] ==> Final Response: {}", httpSession.getId(), responseData);
-
 		return ResponseEntity.ok().headers(RestApiController.getHeaders()).body(responseData);
 	}
 
@@ -194,12 +199,11 @@ public class CustomerRestController {
 	public ResponseEntity<?> updateProfileData(@RequestBody FinovaUserDetails FinovaUserDetails) {
 		log.trace("[" + httpSession.getId() + "] ==> Service Called :: Update Profile Information ["
 				+ httpSession.getId() + "]");
-		log.trace("[" + httpSession.getId() + "] ==> Received Request : " + FinovaUserDetails);
 		FinovaUserDetails userProfile = null;
 		try {
 			userProfile = customerService.updateProfile(FinovaUserDetails);
-		} catch (Exception var7) {
-			var7.printStackTrace();
+		} catch (Exception ex) {
+			ex.printStackTrace();
 			log.trace("[" + httpSession.getId() + "] ==> Exception occured while processing request");
 		}
 
@@ -210,6 +214,7 @@ public class CustomerRestController {
 		responseData.put("USER_ID", userProfile.getUserId());
 		responseData.put("DATA", userProfile);
 
+		log.info("[{}] ==> Final Response: {}", httpSession.getId(), responseData);
 		return ResponseEntity.status(HttpStatus.OK).headers(RestApiController.getHeaders()).body(responseData);
 	}
 

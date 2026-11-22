@@ -93,11 +93,31 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
 .goal-body{display:flex;align-items:center;gap:20px;padding:16px;border-radius:20px;
   background:linear-gradient(135deg,#fcfcff,var(--tint));border:1px solid #f1f5f9}
-.ring{flex:none;position:relative;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;
-  background:conic-gradient(var(--a),var(--b) calc(var(--p) * 1%),#e9e5ff 0);
-  box-shadow:0 10px 20px -6px color-mix(in srgb,var(--a) 50%,transparent)}
-.ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:#fff}
-.ring b{position:relative;font-family:var(--serif);font-size:22px;color:var(--ink)}
+@property --pp{syntax:"<number>";inherits:false;initial-value:0}
+.ring{--pp:var(--p);flex:none;position:relative;width:110px;height:110px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(from 0deg,var(--t1),var(--t2) calc(var(--pp) * 1%),#ece9fb 0);
+  box-shadow:0 0 0 6px color-mix(in srgb,var(--t1) 12%,transparent),0 18px 32px -8px color-mix(in srgb,var(--t1) 60%,transparent);
+  animation:ringFill 1.3s cubic-bezier(.22,1,.36,1) both}
+@keyframes ringFill{from{--pp:0}to{--pp:var(--p)}}
+.ring::before{content:"";position:absolute;inset:11px;border-radius:50%;
+  background:radial-gradient(circle at 30% 25%,#fff,#f8f7ff);box-shadow:inset 0 6px 14px rgba(30,27,75,.09)}
+.ring::after{content:"";position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;
+  background:#fff;border:4px solid var(--t2);box-shadow:0 4px 10px color-mix(in srgb,var(--t2) 60%,transparent);
+  transform:rotate(calc(var(--pp) * 3.6deg)) translateY(-49px)}
+.ring[data-p="0"]::after,.ring.done::after{display:none}
+.ring .rc{position:relative;z-index:1;text-align:center;line-height:1}
+.ring b{display:block;font-family:var(--serif);font-size:27px;background:linear-gradient(135deg,var(--t1),var(--t2));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.ring small{display:block;margin-top:5px;font-size:9px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+.ring.done{animation:ringFill 1.3s cubic-bezier(.22,1,.36,1) both,ringGlow 2.4s ease-in-out 1.3s infinite}
+@keyframes ringGlow{50%{box-shadow:0 0 0 10px rgba(251,191,36,.22),0 18px 40px -6px rgba(249,115,22,.75)}}
+
+/* progress tiers: colour follows how much of the goal is achieved */
+.goal-card.tier-0{--t1:#f43f5e;--t2:#fb923c}
+.goal-card.tier-1{--t1:#f97316;--t2:#facc15}
+.goal-card.tier-2{--t1:#0ea5e9;--t2:#6366f1}
+.goal-card.tier-3{--t1:#14b8a6;--t2:#22c55e}
+.goal-card.tier-4{--t1:#fbbf24;--t2:#f97316}
 .amounts{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
 .amount-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .amount-label{color:var(--muted);font-size:12px;font-weight:600}
@@ -105,10 +125,10 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 .amount-row.target .amount-value{color:var(--a)}
 
 .progress-container{width:100%;height:10px;margin-top:18px;background:#ede9fe;border-radius:999px;overflow:hidden}
-.progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--a),var(--b));
-  box-shadow:0 0 12px color-mix(in srgb,var(--a) 60%,transparent)}
+.progress-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--t1),var(--t2));
+  box-shadow:0 0 12px color-mix(in srgb,var(--t1) 60%,transparent)}
 .progress-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
-.percentage{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--tint);
+.percentage{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:color-mix(in srgb,var(--t1) 14%,#fff);
   color:var(--ink);font-size:12px;font-weight:700}
 .percentage.done{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#78350f}
 .target-date{padding:6px 12px;border-radius:999px;background:#f8fafc;color:#64748b;font-size:12px;font-weight:600}
@@ -158,7 +178,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 .goal-card{animation:rise .6s both}
 @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
 .goal-card::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;z-index:2;background:linear-gradient(90deg,var(--a),var(--b))}
-.goal-card:hover .ring{transform:scale(1.06) rotate(-4deg)}
+.goal-card:hover .ring{transform:scale(1.05)}
 .ring{transition:.35s}
 .goal-name{background:linear-gradient(135deg,var(--ink),color-mix(in srgb,var(--a) 70%,var(--ink)));
   -webkit-background-clip:text;background-clip:text;color:transparent}
@@ -172,17 +192,17 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 .target-date.overdue{background:#fff1f2;color:#be123c}
 .target-date.ok{background:#ecfdf5;color:#047857}
 .goal-card.done{box-shadow:0 2px 4px rgba(30,27,75,.04),0 20px 40px -8px rgba(251,191,36,.45)}
-.goal-card.done .ring b{color:#b45309}
 
 @media (max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:420px){.stats{grid-template-columns:1fr}}
 /* EDIT / DELETE */
-.goal-actions{display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px dashed #e2e8f0}
-.goal-btn{flex:1;border:none;border-radius:999px;padding:11px 14px;font-size:12.5px;font-weight:800;cursor:pointer;transition:.25s}
-.goal-btn.edit{color:#fff;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 18px -8px color-mix(in srgb,var(--a) 70%,transparent)}
-.goal-btn.delete{flex:0 0 auto;color:#be123c;background:#ffe4e6}
-.goal-btn:hover{transform:translateY(-2px)}
-.goal-btn.delete:hover{background:linear-gradient(135deg,#f43f5e,#be123c);color:#fff;box-shadow:0 10px 18px -8px rgba(190,18,60,.6)}
+.goal-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;padding-top:16px;border-top:1px dashed #e2e8f0}
+.goal-btn{display:flex;align-items:center;justify-content:center;gap:8px;height:46px;border:none;border-radius:999px;color:#fff;
+  font-size:13px;font-weight:800;cursor:pointer;transition:.25s}
+.goal-btn.edit{background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 12px 20px -8px color-mix(in srgb,var(--a) 70%,transparent)}
+.goal-btn.delete{background:linear-gradient(135deg,#f43f5e,#be123c);box-shadow:0 12px 20px -8px rgba(190,18,60,.6)}
+.goal-btn:hover{transform:translateY(-3px);filter:brightness(1.06)}
+.goal-btn:active{transform:scale(.97)}
 
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,27,75,.55);backdrop-filter:blur(6px);z-index:1000;
   align-items:center;justify-content:center;padding:18px}
@@ -202,7 +222,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 .gm-group textarea{min-height:84px;resize:vertical;line-height:1.6}
 .gm-group input:hover,.gm-group select:hover,.gm-group textarea:hover{border-color:#c4b5fd}
 .gm-group input:focus,.gm-group select:focus,.gm-group textarea:focus{outline:none;border-color:#7c3aed;background:#fff;box-shadow:0 0 0 4px rgba(124,58,237,.12)}
-.gm-group input[readonly]{background:#f1f5f9;color:#475569;font-weight:800;cursor:not-allowed}
+.gm-group input[readonly],.gm-group textarea[readonly]{background:#f1f5f9;color:#475569;font-weight:800;cursor:not-allowed}
 .gm-add input{border-color:#99f6e4;background:#f0fdfa}
 .gm-hint{margin-top:6px;font-size:12px;color:#64748b}
 .gm-preview{margin:6px 0 4px;padding:18px 20px;border-radius:20px;color:#fff;
@@ -236,6 +256,31 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 .toast.hide{animation:toastOut .25s ease forwards}
 @keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
 @keyframes toastOut{to{opacity:0;transform:translateX(30px)}}
+/* CONGRATULATIONS */
+.congrats{position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:20px;background:rgba(30,27,75,.45);
+  backdrop-filter:blur(4px);cursor:pointer;animation:cFade .3s ease both}
+.congrats.out{animation:cFadeOut .35s ease forwards}
+.congrats-card{position:relative;overflow:hidden;width:min(430px,100%);padding:38px 30px 28px;border-radius:30px;text-align:center;cursor:default;
+  border:2px solid transparent;
+  background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#fbbf24,#f97316,#ec4899,#8b5cf6) border-box;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);animation:cPop .5s cubic-bezier(.2,1.4,.4,1) both}
+.congrats-trophy{font-size:76px;line-height:1;animation:cBounce 1s ease-in-out infinite;filter:drop-shadow(0 12px 16px rgba(245,158,11,.55))}
+.congrats h2{margin:14px 0 8px;font-family:var(--serif);font-size:32px;
+  background:linear-gradient(90deg,#f59e0b,#ec4899,#7c3aed);-webkit-background-clip:text;background-clip:text;color:transparent}
+.congrats p{color:#475569;font-size:15px;line-height:1.7}
+.congrats p strong{color:var(--ink)}
+.congrats-bar{height:6px;margin-top:22px;border-radius:6px;background:#f1f5f9;overflow:hidden}
+.congrats-bar span{display:block;height:100%;transform-origin:left;background:linear-gradient(90deg,#fbbf24,#f97316,#ec4899);
+  animation:cCountdown 4s linear forwards}
+.confetti{position:fixed;top:-30px;z-index:3001;pointer-events:none;animation:cFall linear forwards}
+@keyframes cFade{from{opacity:0}to{opacity:1}}
+@keyframes cFadeOut{to{opacity:0}}
+@keyframes cPop{from{opacity:0;transform:scale(.7) translateY(30px)}to{opacity:1;transform:none}}
+@keyframes cBounce{50%{transform:translateY(-10px) rotate(-6deg)}}
+@keyframes cCountdown{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes cFall{to{transform:translateY(112vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){.confetti{display:none}}
+
 @media (max-width:640px){.gm-row{grid-template-columns:1fr}.goal-modal{padding:30px 18px 22px}.toast-container{top:84px;right:15px}}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -280,29 +325,30 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 <div class="modal-overlay" id="editGoalModal" role="dialog" aria-modal="true" aria-labelledby="editGoalHeading">
     <div class="goal-modal">
         <h2 id="editGoalHeading">✏️ Edit Goal</h2>
-        <p class="modal-subtitle">Update the details, or add the amount you have saved since the last update. The new amount is added to your existing current amount.</p>
+        <p class="modal-subtitle">Add the amount you have saved since the last update, or change the target amount, priority or target date. Use a negative amount (for example -1000) to withdraw money from the goal.</p>
 
         <form id="editGoalForm">
             <input type="hidden" id="editGoalId">
 
             <div class="gm-group">
-                <label for="egTitle">🎯 Goal Title <span class="req">*</span></label>
-                <input type="text" id="egTitle" maxlength="150" placeholder="e.g. Buy Laptop" required>
+                <label for="egTitle">🎯 Goal Title</label>
+                <input type="text" id="egTitle" readonly>
             </div>
 
             <div class="gm-group">
-                <label for="egDescription">🗒️ Goal Description <span class="req">*</span></label>
-                <textarea id="egDescription" maxlength="5000" placeholder="Describe your financial goal..."></textarea>
+                <label for="egDescription">🗒️ Goal Description</label>
+                <textarea id="egDescription" readonly></textarea>
+                <div class="gm-hint">🔒 Title and description are fixed once a goal is created.</div>
             </div>
 
             <div class="gm-row">
                 <div class="gm-group">
-                    <label for="egTarget">💰 Target Amount <span class="req">*</span></label>
+                    <label for="egTarget">💰 Target Amount <span class="req"></span></label>
                     <input type="number" id="egTarget" min="0" step="0.01" placeholder="e.g. 20">
                 </div>
 
                 <div class="gm-group">
-                    <label for="egPriority">⭐ Priority <span class="req">*</span></label>
+                    <label for="egPriority">⭐ Priority <span class="req"></span></label>
                     <select id="egPriority">
                         <option value="LOW">🟢 Low</option>
                         <option value="MEDIUM">🟡 Medium</option>
@@ -312,7 +358,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             </div>
 
             <div class="gm-group">
-                <label for="egDate">📅 Target Date <span class="req">*</span></label>
+                <label for="egDate">📅 Target Date <span class="req"></span></label>
                 <input type="date" id="egDate">
             </div>
 
@@ -323,11 +369,11 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
                 </div>
 
                 <div class="gm-group gm-add">
-                    <label for="egAdd">➕ Add Amount Now</label>
-                    <input type="number" id="egAdd" min="0" step="0.01" placeholder="e.g. 10">
+                    <label for="egAdd">🔄 Manage Contributions</label>
+                    <input type="number" id="egAdd" step="0.01" placeholder="e.g. 10 or -1000">
                 </div>
             </div>
-            <div class="gm-hint">Enter only the new amount you saved. It is added to the existing amount.</div>
+            <div class="gm-hint">Enter a positive amount to add savings, or a negative amount (e.g. -1000) to withdraw. It is added to the existing amount.</div>
 
             <div class="gm-preview" id="egPreview">
                 <div class="gm-preview-top"><span>🎯 Updated Progress</span><b id="egPct">0%</b></div>
@@ -389,7 +435,9 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
             console.log("Goal Response Object:", data);
 
-            const goalData = data.respMessage;
+            const goalData = Array.isArray(data.respMessage)
+                ? data.respMessage.filter(isActiveGoal)
+                : data.respMessage;
 
             if (!goalData || !Array.isArray(goalData) || goalData.length === 0) {
                 showEmptyState();
@@ -423,7 +471,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
         list.forEach(goal => {
             const target = parseFloat(goal.targetAmount || 0);
-            const saved = parseFloat(goal.currentAmount || 0);
+            const saved = getCurrentAmount(goal);
             totalTarget += target;
             totalSaved += saved;
             if (target > 0 && saved >= target) { achieved++; }
@@ -490,7 +538,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             const description =
                 goal.goal || goal.subject || goal.description || "No description available.";
             const targetAmount = parseFloat(goal.targetAmount || 0);
-            const currentAmount = parseFloat(goal.currentAmount || 0);
+            const currentAmount = getCurrentAmount(goal);
 
             const percentage = targetAmount > 0
                 ? Math.min((currentAmount / targetAmount) * 100, 100)
@@ -511,11 +559,13 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
             const remaining = Math.max(targetAmount - currentAmount, 0);
 
+            const tier = percentage >= 100 ? 4 : percentage >= 75 ? 3 : percentage >= 50 ? 2 : percentage >= 25 ? 1 : 0;
+
             const daysInfo = getDaysInfo(targetDate, percentage >= 100);
 
             const card = document.createElement("div");
 
-            card.className = "goal-card t" + ((index % 5) + 1) + (percentage >= 100 ? " done" : "");
+            card.className = "goal-card t" + ((index % 5) + 1) + " tier-" + tier + (percentage >= 100 ? " done" : "");
             card.style.animationDelay = (index * 80) + "ms";
 
             card.innerHTML = `
@@ -529,8 +579,11 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
                 <div class="goal-body">
 
-                    <div class="ring" style="--p:${percentage.toFixed(1)}">
-                        <b>${percentage.toFixed(0)}%</b>
+                    <div class="ring ${percentage >= 100 ? "done" : ""}" style="--p:${percentage.toFixed(1)}" data-p="${Math.round(percentage)}">
+                        <div class="rc">
+                            <b>${percentage.toFixed(0)}%</b>
+                            <small>${percentage >= 100 ? "🏆 Done" : "Complete"}</small>
+                        </div>
                     </div>
 
                     <div class="amounts">
@@ -565,7 +618,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
                 </div>
 
                 <div class="goal-actions">
-                    <button type="button" class="goal-btn edit">✏️ Edit / Add Amount</button>
+                    <button type="button" class="goal-btn edit">✏️ Edit</button>
                     <button type="button" class="goal-btn delete">🗑️ Delete</button>
                 </div>
 
@@ -578,6 +631,8 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             card.querySelector(".goal-btn.delete").addEventListener("click", function () {
                 openDeleteGoal(goalId);
             });
+
+            animateCount(card.querySelector(".ring b"), Math.round(percentage));
 
             goalGrid.appendChild(card);
         });
@@ -684,12 +739,12 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
     /* ==================================================
        EDIT / DELETE GOALS
-       (adjust these two URLs if your controller uses
-        different paths)
+       POST /goal/update  -> adds currentAmount to the saved amount
+       POST /goal/delete  -> deletes by goalId
     ================================================== */
 
-    const UPDATE_GOAL_URL = "/finova/api/v1/update/goal";
-    const DELETE_GOAL_URL = "/finova/api/v1/delete/goal/";
+    const UPDATE_GOAL_URL = "/finova/api/v1/goal/update";
+    const DELETE_GOAL_URL = "/finova/api/v1/goal/delete";
 
     let goalRecords = [];
 
@@ -699,6 +754,27 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
         const id = goal.goalId ?? goal.noteId ?? goal.id ?? goal.goalID;
 
         return (id === undefined || id === null || id === "") ? "" : String(id);
+    }
+
+    // CURRENT_AMOUNT is the running total. If it has not been saved yet,
+    // fall back to the initial amount entered when the goal was created.
+    function getCurrentAmount(goal) {
+
+        const current = goal.currentAmount;
+
+        if (current !== undefined && current !== null && String(current).trim() !== "") {
+            return parseFloat(current) || 0;
+        }
+
+        return parseFloat(goal.amount || 0) || 0;
+    }
+
+    // Hide goals that were deleted (ACTIVE_FLAG = N).
+    function isActiveGoal(goal) {
+
+        const flag = String(goal.flag ?? "").trim().toUpperCase();
+
+        return flag === "" || flag === "Y";
     }
 
     function findGoal(goalId) {
@@ -813,10 +889,10 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
         document.getElementById("egDate").dataset.original = toInputDate(goal.targetDate);
 
         document.getElementById("egExisting").value =
-            "₹ " + formatAmount(parseFloat(goal.currentAmount || 0));
+            "₹ " + formatAmount(getCurrentAmount(goal));
 
         document.getElementById("egExisting").dataset.value =
-            String(parseFloat(goal.currentAmount || 0));
+            String(getCurrentAmount(goal));
 
         document.getElementById("egAdd").value = "";
 
@@ -841,22 +917,26 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
         const added = readNumber("egAdd");
         const target = readNumber("egTarget");
 
-        const updated = existing + added;
+        const updated = Number((existing + added).toFixed(2));
 
-        const percentage = target > 0 ? Math.min((updated / target) * 100, 100) : 0;
+        const percentage = target > 0 ? Math.max(Math.min((updated / target) * 100, 100), 0) : 0;
 
         document.getElementById("egPct").textContent = percentage.toFixed(0) + "%";
         document.getElementById("egBar").style.width = percentage + "%";
 
+        const belowZero = updated < 0;
+        const aboveTarget = target > 0 && updated > target;
+
+        // Positive amount: "₹ 15.00 + ₹ 3.00"   Negative amount: "₹ 15.00 − ₹ 3.00"
         document.getElementById("egSum").textContent =
             "₹ " + formatAmount(existing) +
-            " + ₹ " + formatAmount(added) +
+            (added < 0 ? " − ₹ " : " + ₹ ") + formatAmount(Math.abs(added)) +
             " = ₹ " + formatAmount(updated) +
             " / ₹ " + formatAmount(target) +
-            (target > 0 && updated > target ? "  ⚠️ exceeds target" : "");
+            (belowZero ? "  ⚠️ below zero" : aboveTarget ? "  ⚠️ exceeds target" : "");
 
         document.getElementById("egPreview")
-            .classList.toggle("warn", target > 0 && updated > target);
+            .classList.toggle("warn", belowZero || aboveTarget);
     }
 
     document.getElementById("egAdd").addEventListener("input", updateEditPreview);
@@ -868,8 +948,6 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
         const goalId = document.getElementById("editGoalId").value;
 
-        const title = document.getElementById("egTitle").value.trim();
-        const description = document.getElementById("egDescription").value.trim();
         const priority = document.getElementById("egPriority").value;
         const targetDate = document.getElementById("egDate").value;
         const originalDate = document.getElementById("egDate").dataset.original || "";
@@ -879,20 +957,10 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
         const existing = parseFloat(document.getElementById("egExisting").dataset.value || 0);
         const addedAmount = readNumber("egAdd");
-        const updatedCurrent = existing + addedAmount;
+        const updatedCurrent = Number((existing + addedAmount).toFixed(2));
 
         if (!goalId) {
             showToast("Goal ID is missing.", "error");
-            return;
-        }
-
-        if (!title) {
-            showToast("Please enter goal title.", "error");
-            return;
-        }
-
-        if (!description) {
-            showToast("Please enter goal description.", "error");
             return;
         }
 
@@ -901,8 +969,9 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             return;
         }
 
-        if (addedAmount < 0) {
-            showToast("Added amount cannot be negative.", "error");
+        // A negative amount is a withdrawal; it cannot take the goal below zero.
+        if (updatedCurrent < 0) {
+            showToast("Withdrawal cannot exceed the current amount (₹ " + formatAmount(existing) + ").", "error");
             return;
         }
 
@@ -922,18 +991,18 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             return;
         }
 
-        // currentAmount  = updated total (existing + newly added)
-        // addedAmount    = only the newly added amount
+        // The backend ADDS the received currentAmount to the saved
+        // current amount, so only the newly added amount is sent.
         const requestData = {
             goalId: goalId,
-            goalTitle: title,
-            goal: description,
-            targetAmount: targetAmount,
-            currentAmount: Number(updatedCurrent.toFixed(2)),
-            addedAmount: Number(addedAmount.toFixed(2)),
+            targetAmount: String(targetAmount),
             priority: priority,
             targetDate: targetDate
         };
+
+        if (addedAmount !== 0) {
+            requestData.currentAmount = String(Number(addedAmount.toFixed(2)));
+        }
 
         const saveButton = document.getElementById("egSave");
 
@@ -943,7 +1012,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
         try {
 
             const response = await fetch(UPDATE_GOAL_URL, {
-                method: "PUT",
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
@@ -963,6 +1032,11 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             showToast("Goal updated successfully!", "success");
 
             loadGoalList();
+
+            // Goal just reached 100%: celebrate for 4 seconds.
+            if (targetAmount > 0 && updatedCurrent >= targetAmount && existing < targetAmount) {
+                showCongrats(document.getElementById("egTitle").value, targetAmount);
+            }
 
         } catch (error) {
 
@@ -1020,13 +1094,14 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
 
         try {
 
-            const response = await fetch(DELETE_GOAL_URL + encodeURIComponent(goalId), {
-                method: "PUT",
+            const response = await fetch(DELETE_GOAL_URL, {
+                method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 },
-                credentials: "same-origin"
+                credentials: "same-origin",
+                body: JSON.stringify({ goalId: goalId })
             });
 
             const data = await readJson(response);
@@ -1053,6 +1128,126 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.1;position:relative}
             button.textContent = "🗑️ Delete";
         }
     });
+
+
+    /* ---------- PERCENTAGE COUNT-UP ---------- */
+
+    function animateCount(element, target) {
+
+        if (!element) {
+            return;
+        }
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || target <= 0) {
+            element.textContent = target + "%";
+            return;
+        }
+
+        const duration = 1200;
+        const start = performance.now();
+
+        function step(now) {
+
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+
+            element.textContent = Math.round(target * eased) + "%";
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        }
+
+        element.textContent = "0%";
+
+        requestAnimationFrame(step);
+    }
+
+
+    /* ---------- CONGRATULATIONS (shown for 4 seconds) ---------- */
+
+    function showCongrats(goalTitle, targetAmount) {
+
+        const overlay = document.createElement("div");
+        overlay.className = "congrats";
+
+        const card = document.createElement("div");
+        card.className = "congrats-card";
+
+        const trophy = document.createElement("div");
+        trophy.className = "congrats-trophy";
+        trophy.textContent = "🏆";
+
+        const heading = document.createElement("h2");
+        heading.textContent = "🎉 Congratulations!";
+
+        const text = document.createElement("p");
+
+        const name = document.createElement("strong");
+        name.textContent = "“" + goalTitle + "”";
+
+        text.appendChild(document.createTextNode("You have achieved your goal "));
+        text.appendChild(name);
+        text.appendChild(document.createTextNode(" and reached your target of ₹ " + formatAmount(targetAmount) + ". Well done! 🌟"));
+
+        const bar = document.createElement("div");
+        bar.className = "congrats-bar";
+        bar.appendChild(document.createElement("span"));
+
+        card.appendChild(trophy);
+        card.appendChild(heading);
+        card.appendChild(text);
+        card.appendChild(bar);
+
+        card.addEventListener("click", function (event) {
+            event.stopPropagation();
+        });
+
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+
+        const symbols = ["🎉", "🎊", "✨", "⭐", "💰", "🪙", "💜"];
+        const pieces = [];
+
+        for (let i = 0; i < 40; i++) {
+
+            const piece = document.createElement("span");
+
+            piece.className = "confetti";
+            piece.textContent = symbols[i % symbols.length];
+            piece.style.left = (Math.random() * 100) + "vw";
+            piece.style.fontSize = (16 + Math.random() * 16) + "px";
+            piece.style.animationDuration = (2.2 + Math.random() * 1.8) + "s";
+            piece.style.animationDelay = (Math.random() * 0.8) + "s";
+
+            document.body.appendChild(piece);
+            pieces.push(piece);
+        }
+
+        let closed = false;
+
+        function closeCongrats() {
+
+            if (closed) {
+                return;
+            }
+
+            closed = true;
+
+            clearTimeout(timer);
+
+            overlay.classList.add("out");
+
+            setTimeout(function () {
+                overlay.remove();
+                pieces.forEach(function (piece) { piece.remove(); });
+            }, 350);
+        }
+
+        const timer = setTimeout(closeCongrats, 4000);
+
+        overlay.addEventListener("click", closeCongrats);
+    }
 
 
     /* ---------- CLOSE MODALS ---------- */

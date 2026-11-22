@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.finance.entity.FinovaUserDetails;
 import com.finance.exception.FinovaException;
 import com.finance.model.CustomerDetails;
+import com.finance.model.FinMailRequest;
 import com.finance.model.FinovaSessionUser;
 import com.finance.repository.UserRegisterRepository;
 import com.finance.utils.FinUtils;
@@ -33,16 +34,18 @@ public class CustomerServiceImpl implements CustomerService {
 	private final RequestValidator requestValidator;
 	private final FinUtils finUtils;
 	private final FinovaSessionManager finovaSessionManager;
+	private final FinMailService finMailService;
 
 	public CustomerServiceImpl(HttpSession httpSession, RequestValidator requestValidator,
 			UserRegisterRepository userRegisterRepository, PasswordEncoder passwordEncoder, FinUtils finUtils,
-			FinovaSessionManager finovaSessionManager) {
+			FinovaSessionManager finovaSessionManager, FinMailService finMailService) {
 		this.httpSession = httpSession;
 		this.requestValidator = requestValidator;
 		this.userRegisterRepository = userRegisterRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.finUtils = finUtils;
 		this.finovaSessionManager = finovaSessionManager;
+		this.finMailService = finMailService;
 	}
 
 	public FinovaUserDetails getFinovaUser() {
@@ -118,6 +121,18 @@ public class CustomerServiceImpl implements CustomerService {
 					log.error("[{}] ==> Failed to save User Details to Database", httpSession.getId());
 					return new FinovaException("FIN1002", "Internal issue! Please try later");
 				});
+
+		FinMailRequest userRegistrationMail = new FinMailRequest();
+		userRegistrationMail.setTo(userRegister.getEmail());
+		userRegistrationMail.setSubject("Welcome to FINOVA – Registration Successful!");
+		userRegistrationMail.setMessage("Dear " + userRegister.getUserName() + ",\n\n" + "Welcome to FINOVA!\n\n"
+				+ "We are delighted to have you onboard. Your registration has been completed successfully.\n\n"
+				+ "With FINOVA, you can manage your personal finances, track your income and expenses, "
+				+ "monitor your investments, and stay on top of your financial goals — all in one place.\n\n"
+				+ "Best Regards,\n" + "🌿 FINOVA Team\n" + "Smart Finance. Smarter Future.\n\n"
+				+ "This is an automated email. Please do not reply to this message.");
+		
+		finMailService.sendMail(userRegistrationMail);
 
 		log.debug("[{}] ==> User Registration Successful", httpSession.getId());
 		return userRegistered;
@@ -227,7 +242,7 @@ public class CustomerServiceImpl implements CustomerService {
 			Optional.ofNullable(finovaUserProfile.getMaritalStatus()).ifPresent(finovaUserDetails::setMaritalStatus);
 			Optional.ofNullable(finovaUserProfile.getMobileNo()).ifPresent(finovaUserDetails::setMobileNo);
 			Optional.ofNullable(finovaUserProfile.getUserName()).ifPresent(finovaUserDetails::setUserName);
-			
+
 			userProfileUpdated = Optional.of(this.userRegisterRepository.save(finovaUserDetails)).orElseThrow(() -> {
 				log.error("[{}] ==> Failed to save User Details to Database", httpSession.getId());
 				return new FinovaException("FIN1002", "Internal issue! Please try later");

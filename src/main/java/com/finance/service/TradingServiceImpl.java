@@ -153,7 +153,12 @@ public class TradingServiceImpl implements TradingService {
 	@Override
 	public List<FinTradingDetails> getRecentTrades() {
 		log.debug("[{}] GET Recent Trades Service", httpSession.getId());
-		return finTradingRepository.findTop10RecentTrades();
+		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
+                .orElseThrow(() -> {
+                    log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+                    return new FinovaException("MPAY1019", "Please login to access this service");
+                });
+		return finTradingRepository.findTop10RecentTrades(finovaUserDetails.getUserId());
 	}
 
 	@Override
@@ -302,7 +307,14 @@ public class TradingServiceImpl implements TradingService {
 	@Override
 	public BigDecimal getTotalCapital() {
 		log.debug("[{}] Get Total Capital Service", httpSession.getId());
-		BigDecimal totalCapital = transactionRepository.getTradingCapital();
+		
+		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
+                .orElseThrow(() -> {
+                    log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+                    return new FinovaException("MPAY1019", "Please login to access this service");
+                });
+
+		BigDecimal totalCapital = transactionRepository.getTradingCapital(finovaUserDetails.getUserId());
 		log.debug("[{}] Total Capital Fetched Successfully :: {}", httpSession.getId(), totalCapital);
 		return totalCapital;
 	}
@@ -310,6 +322,14 @@ public class TradingServiceImpl implements TradingService {
 	@Override
 	public List<FinTradingDetails> getTradeList() {
 		log.debug("[{}] GET List Of Trades", httpSession.getId());
-		return finTradingRepository.findAll();
+		
+		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
+                .orElseThrow(() -> {
+                    log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+                    return new FinovaException("MPAY1019", "Please login to access this service");
+                });
+		log.debug("[{}] finovaUserDetails : {}", httpSession.getId(), finovaUserDetails);
+		
+		return finTradingRepository.getTradeList(finovaUserDetails.getUserId());
 	}
 }

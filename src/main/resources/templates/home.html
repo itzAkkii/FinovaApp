@@ -8,25 +8,43 @@
 
 <title>Finova - Dashboard</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
 
 /* ================= GLOBAL ================= */
+
+:root {
+    --ink: #1e1b4b;
+    --text: #475569;
+    --muted: #94a3b8;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+}
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: var(--sans);
 }
 
 body {
     min-height: 100vh;
+    color: var(--ink);
     background:
         radial-gradient(circle at 6% 0%, rgba(124,58,237,0.14), transparent 38%),
         radial-gradient(circle at 94% 14%, rgba(236,72,153,0.12), transparent 36%),
         radial-gradient(circle at 50% 100%, rgba(20,184,166,0.10), transparent 40%),
         linear-gradient(135deg, #eef2ff, #fdf2f8, #ecfeff);
     background-attachment: fixed;
+}
+
+:focus-visible {
+    outline: 3px solid #a855f7;
+    outline-offset: 2px;
 }
 
 /* ================= HEADER ================= */
@@ -46,9 +64,10 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 28px;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-family: var(--serif);
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
 }
 
 .logo-icon {
@@ -65,8 +84,9 @@ body {
 
 .logo-f {
     color: white;
+    font-family: var(--serif);
     font-size: 25px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1;
 }
 
@@ -83,10 +103,12 @@ body {
 
 .logo-text {
     color: white;
+    font-family: var(--serif);
 }
 
 .logo-text span {
     color: #fbcfe8;
+    font-family: var(--serif);
 }
 
 .user-section {
@@ -105,9 +127,9 @@ body {
     gap: 6px;
     min-height: 44px;
     padding: 11px 20px;
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 800;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
     transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background .25s ease;
 }
@@ -178,14 +200,18 @@ body {
 }
 
 .welcome h1 {
-    font-size: 32px;
-    color: #312e81;
-    margin-bottom: 8px;
+    font-family: var(--serif);
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
 }
 
 .welcome p {
     color: #64748b;
-    font-size: 16px;
+    font-size: 15.5px;
+    line-height: 1.6;
 }
 
 /* ================= PREMIUM SUMMARY CARDS ================= */
@@ -352,8 +378,8 @@ body {
 
 .card-title {
     color: rgba(255,255,255,0.95);
-    font-size: 15px;
-    font-weight: 750;
+    font-size: 14.5px;
+    font-weight: 700;
     letter-spacing: .3px;
 }
 
@@ -375,9 +401,10 @@ body {
 .card-value {
     position: relative;
     z-index: 1;
+    font-family: var(--serif);
     font-size: clamp(28px, 2.7vw, 38px);
-    font-weight: 850;
-    letter-spacing: -.6px;
+    font-weight: 700;
+    letter-spacing: -.3px;
     line-height: 1.15;
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
@@ -521,8 +548,10 @@ body {
 /* ================= QUICK ACTIONS ================= */
 
 .section-title {
-    color: #312e81;
-    font-size: 24px;
+    font-family: var(--serif);
+    color: var(--ink);
+    font-size: 27px;
+    font-weight: 700;
     margin-bottom: 20px;
 }
 
@@ -620,16 +649,17 @@ body {
 }
 
 .action h3 {
-    color: #1e1b4b;
+    font-family: var(--serif);
+    color: var(--ink);
     margin-bottom: 7px;
-    font-size: 19px;
-    font-weight: 800;
+    font-size: 21px;
+    font-weight: 700;
 }
 
 .action p {
     color: #64748b;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 .action-go {
@@ -657,16 +687,6 @@ body {
     box-shadow: 0 8px 16px var(--shadow);
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .card,
-    .spark path.line,
-    .card-foot-dot::after { animation: none; }
-    .spark path.line { stroke-dashoffset: 0; }
-    .card, .card::after, .action, .action::after, .progress-fill,
-    .user-name, .logout-btn { transition: none; }
-    .user-name::after, .logout-btn::after { display: none; }
-}
-
 /* ================= PROFILE MODAL ================= */
 
 .profile-overlay {
@@ -674,8 +694,12 @@ body {
     position: fixed;
     inset: 0;
     z-index: 99999;
-    background: rgba(10,15,35,0.75);
-    backdrop-filter: blur(9px);
+    background:
+        radial-gradient(circle at 20% 10%, rgba(124,58,237,0.35), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(236,72,153,0.28), transparent 45%),
+        rgba(10,12,32,0.78);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -683,41 +707,62 @@ body {
 
 .profile-overlay.active {
     display: flex;
+    animation: overlayFade .3s ease;
 }
 
+@keyframes overlayFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Header and footer stay fixed; only the body scrolls */
 .profile-modal {
+    position: relative;
     width: 100%;
-    max-width: 680px;
+    max-width: 700px;
     max-height: 92vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 30px 90px rgba(0,0,0,0.35);
-    animation: profileEntrance 0.35s ease;
+    border-radius: 28px;
+    box-shadow:
+        0 40px 100px rgba(8,6,40,0.55),
+        0 0 0 1px rgba(255,255,255,0.18),
+        0 0 80px rgba(139,92,246,0.25);
+    animation: profileEntrance .45s cubic-bezier(.2,.8,.2,1);
 }
 
 @keyframes profileEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.96);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(34px) scale(.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* PROFILE HEADER */
+/* ---------- Banner ---------- */
 
 .profile-banner {
     position: relative;
-    padding: 32px 35px 30px;
+    flex-shrink: 0;
+    padding: 26px 34px 30px;
     color: white;
-    background:
-        radial-gradient(circle at 90% 10%, rgba(236,72,153,0.45), transparent 35%),
-        radial-gradient(circle at 10% 100%, rgba(99,102,241,0.45), transparent 40%),
-        linear-gradient(135deg, #111827, #312e81, #6d28d9);
     overflow: hidden;
+    background:
+        radial-gradient(circle at 92% 8%, rgba(236,72,153,0.55), transparent 38%),
+        radial-gradient(circle at 8% 100%, rgba(99,102,241,0.55), transparent 42%),
+        radial-gradient(circle at 50% 0%, rgba(168,85,247,0.30), transparent 50%),
+        linear-gradient(135deg, #0f172a, #2e1065 45%, #6d28d9);
+}
+
+/* fine dot texture */
+.profile-banner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(255,255,255,0.13) 1px, transparent 1px);
+    background-size: 18px 18px;
+    -webkit-mask-image: linear-gradient(120deg, transparent 20%, #000 100%);
+    mask-image: linear-gradient(120deg, transparent 20%, #000 100%);
 }
 
 .profile-banner::after {
@@ -725,12 +770,13 @@ body {
     position: absolute;
     width: 210px;
     height: 210px;
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.14);
     border-radius: 50%;
     right: -65px;
     top: -95px;
     box-shadow: 0 0 0 25px rgba(255,255,255,0.035),
-                0 0 0 50px rgba(255,255,255,0.025);
+                0 0 0 50px rgba(255,255,255,0.025),
+                0 0 0 75px rgba(255,255,255,0.015);
     pointer-events: none;
 }
 
@@ -743,163 +789,405 @@ body {
 }
 
 .profile-brand {
-    font-size: 12px;
-    letter-spacing: 2px;
-    font-weight: bold;
-    color: #c4b5fd;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 18px 7px 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
+    border: 1px solid rgba(255,255,255,0.32);
+    box-shadow: 0 10px 22px -8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.profile-brand::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent, rgba(255,255,255,0.35), transparent);
+    transform: skewX(-18deg);
+    animation: brandShine 5s ease-in-out infinite;
+}
+
+@keyframes brandShine {
+    0%, 55% { left: -60%; }
+    100% { left: 130%; }
+}
+
+.pb-logo {
+    position: relative;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 12px rgba(168,85,247,0.55), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.pb-f {
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.pb-leaf {
+    position: absolute;
+    top: 1px;
+    right: 0;
+    width: 12px;
+    height: 7px;
+    background: linear-gradient(135deg, #86efac, #22c55e);
+    border-radius: 100% 0 100% 0;
+    transform: rotate(-25deg);
+}
+
+.pb-name {
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.pb-name span {
+    color: #fbcfe8;
+    font-family: var(--serif);
+}
+
+.pb-divider {
+    width: 1px;
+    height: 20px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.6), transparent);
+}
+
+.pb-tag {
+    color: #e9d5ff;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
 }
 
 .profile-close {
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(255,255,255,0.25);
-    background: rgba(255,255,255,0.12);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255,255,255,0.28);
+    background: linear-gradient(135deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
     color: white;
     border-radius: 50%;
-    font-size: 23px;
+    font-size: 22px;
+    line-height: 1;
     cursor: pointer;
-    transition: 0.3s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+    transition: background .3s ease, transform .3s ease, box-shadow .3s ease;
 }
 
 .profile-close:hover {
-    background: #ec4899;
+    background: linear-gradient(135deg, #ec4899, #db2777);
     transform: rotate(90deg);
+    box-shadow: 0 8px 18px rgba(236,72,153,0.45);
+}
+
+.profile-close:focus-visible {
+    outline: 3px solid rgba(255,255,255,0.7);
+    outline-offset: 2px;
 }
 
 .profile-identity {
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin-top: 30px;
+    gap: 22px;
+    margin-top: 26px;
     position: relative;
     z-index: 2;
 }
 
 .profile-avatar {
-    width: 82px;
-    height: 82px;
-    min-width: 82px;
-    border-radius: 24px;
-    background: linear-gradient(135deg, #a78bfa, #ec4899);
-    border: 3px solid rgba(255,255,255,0.45);
+    position: relative;
+    width: 92px;
+    height: 92px;
+    min-width: 92px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #a78bfa, #ec4899 70%, #fb923c);
+    border: 3px solid rgba(255,255,255,0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 29px;
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    box-shadow:
+        0 0 0 6px rgba(255,255,255,0.10),
+        0 16px 34px rgba(236,72,153,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+/* verified tick */
+.profile-avatar::after {
+    content: "✓";
+    position: absolute;
+    right: -8px;
+    bottom: -8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid #2e1065;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 13px;
     font-weight: 800;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    text-shadow: none;
+    background: linear-gradient(135deg, #34d399, #059669);
+    box-shadow: 0 4px 12px rgba(16,185,129,0.5);
 }
 
 .profile-identity h2 {
-    font-size: 25px;
+    font-family: var(--serif);
+    font-size: 31px;
+    line-height: 1.1;
+    font-weight: 700;
     margin-bottom: 8px;
     overflow-wrap: anywhere;
+    text-shadow: 0 3px 14px rgba(0,0,0,0.3);
 }
 
 .profile-subtitle {
     color: #ddd6fe;
-    font-size: 13px;
+    font-size: 13.5px;
+    font-weight: 500;
 }
 
 .profile-badges {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 13px;
 }
 
 .profile-badge {
     font-size: 11px;
-    padding: 6px 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    padding: 6px 12px;
     border-radius: 20px;
     background: rgba(255,255,255,0.13);
-    border: 1px solid rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.20);
     color: white;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
-/* PROFILE BODY */
+/* gold member badge */
+.profile-badge.member {
+    color: #fef3c7;
+    background: linear-gradient(135deg, rgba(251,191,36,0.30), rgba(244,114,182,0.20));
+    border-color: rgba(253,224,71,0.50);
+    box-shadow: 0 4px 14px rgba(251,191,36,0.18);
+}
+
+/* ---------- Body ---------- */
 
 .profile-body {
-    padding: 28px 32px 32px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 28px 34px 30px;
+    background: linear-gradient(180deg, #ffffff, #faf9ff);
+    scrollbar-width: thin;
+    scrollbar-color: #c4b5fd transparent;
 }
 
+.profile-body::-webkit-scrollbar { width: 8px; }
+.profile-body::-webkit-scrollbar-thumb { background: #c4b5fd; border-radius: 8px; }
+.profile-body::-webkit-scrollbar-thumb:hover { background: #a78bfa; }
+
 .profile-section {
-    margin-bottom: 25px;
+    margin-bottom: 26px;
+}
+
+.profile-section:last-child {
+    margin-bottom: 0;
 }
 
 .profile-section-title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #312e81;
-    font-size: 15px;
+    gap: 12px;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
+}
+
+.profile-section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #ddd6fe, transparent);
 }
 
 .profile-section-icon {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ede9fe;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #ede9fe, #fce7f3);
+    border: 1px solid #ddd6fe;
+    border-radius: 12px;
     font-size: 17px;
+    box-shadow: 0 4px 10px rgba(124,58,237,0.10);
 }
 
 .profile-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0,1fr));
-    gap: 13px;
+    gap: 14px;
 }
 
 .profile-item {
-    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 16px 16px 18px;
     border: 1px solid #e8eaf3;
-    border-radius: 15px;
-    background: linear-gradient(135deg,#ffffff,#f8f9ff);
-    transition: 0.25s ease;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ffffff, #f8f9ff);
+    box-shadow: 0 2px 6px rgba(79,70,229,0.04);
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease, background .25s ease;
+    animation: itemIn .5s cubic-bezier(.2,.8,.2,1) both;
     min-width: 0;
+}
+
+/* left accent bar on hover */
+.profile-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    bottom: 14px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: linear-gradient(180deg, #8b5cf6, #ec4899);
+    transform: scaleY(0);
+    transition: transform .3s ease;
 }
 
 .profile-item:hover {
     border-color: #c4b5fd;
     background: #faf8ff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(79,70,229,0.07);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(79,70,229,0.12);
+}
+
+.profile-item:hover::before {
+    transform: scaleY(1);
 }
 
 .profile-item.full-width {
     grid-column: 1 / -1;
 }
 
+.profile-grid .profile-item:nth-child(1) { animation-delay: .05s; }
+.profile-grid .profile-item:nth-child(2) { animation-delay: .10s; }
+.profile-grid .profile-item:nth-child(3) { animation-delay: .15s; }
+.profile-grid .profile-item:nth-child(4) { animation-delay: .20s; }
+.profile-grid .profile-item:nth-child(5) { animation-delay: .25s; }
+
+@keyframes itemIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pi-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 19px;
+    background: linear-gradient(135deg, #ede9fe, #fce7f3);
+    border: 1px solid #e9d5ff;
+    box-shadow: inset 0 1px 0 #fff, 0 4px 10px rgba(124,58,237,0.10);
+    transition: transform .3s ease;
+}
+
+.profile-item:hover .pi-icon {
+    transform: scale(1.08) rotate(-4deg);
+}
+
+.pi-text {
+    min-width: 0;
+    flex: 1;
+}
+
 .profile-label {
     color: #94a3b8;
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 9px;
+    letter-spacing: 1.2px;
+    margin-bottom: 6px;
 }
 
 .profile-value {
-    color: #1e293b;
-    font-size: 14px;
+    color: #1e1b4b;
+    font-size: 14.5px;
     font-weight: 600;
-    line-height: 1.5;
+    line-height: 1.45;
     overflow-wrap: anywhere;
+}
+
+.profile-value.is-empty {
+    color: #a8b1c2;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* edit mode: stacked fields without icon */
+.profile-item.editing {
+    display: block;
+    animation: none;
+}
+
+.profile-item.editing .profile-label {
+    margin-bottom: 9px;
 }
 
 .profile-loading,
 .profile-error {
-    padding: 35px 15px;
+    padding: 40px 15px;
     text-align: center;
-    border-radius: 15px;
+    border-radius: 18px;
     color: #64748b;
-    background: #f8fafc;
+    background: linear-gradient(135deg, #f8fafc, #f5f3ff);
     font-size: 14px;
+    font-weight: 600;
 }
 
 .profile-error {
@@ -911,19 +1199,20 @@ body {
 
 .profile-input {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd6fe;
-    border-radius: 9px;
+    padding: 11px 13px;
+    border: 1.5px solid #ddd6fe;
+    border-radius: 11px;
     outline: none;
     color: #1e293b;
     font-size: 14px;
+    font-weight: 500;
     background: #ffffff;
-    transition: 0.3s;
+    transition: border-color .25s ease, box-shadow .25s ease;
 }
 
 .profile-input:focus {
     border-color: #8b5cf6;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.14);
 }
 
 .profile-input:disabled {
@@ -941,7 +1230,7 @@ textarea.profile-input {
 .profile-message {
     display: none;
     padding: 12px 15px;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-bottom: 18px;
     font-size: 13px;
     font-weight: 600;
@@ -954,15 +1243,15 @@ textarea.profile-input {
     border: 1px solid #fecdd3;
 }
 
-/* ================= PREMIUM SUCCESS NOTIFICATION ================= */
+/* ================= SUCCESS NOTIFICATION ================= */
 
 .profile-success-toast {
     display: flex;
     align-items: center;
     gap: 13px;
     padding: 15px 18px;
-    margin-bottom: 20px;
-    border-radius: 14px;
+    margin-bottom: 22px;
+    border-radius: 16px;
     background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
     border: 1px solid #a7f3d0;
     box-shadow: 0 8px 22px rgba(16,185,129,0.12);
@@ -1014,21 +1303,12 @@ textarea.profile-input {
 }
 
 @keyframes successSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes successSlideOut {
-    to {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+    to { opacity: 0; transform: translateY(-10px); }
 }
 
 @keyframes successProgress {
@@ -1039,18 +1319,21 @@ textarea.profile-input {
 /* ================= PROFILE FOOTER ================= */
 
 .profile-footer {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    padding: 18px 32px;
-    background: #f8fafc;
-    border-top: 1px solid #edf0f5;
+    padding: 16px 34px;
+    background: #ffffff;
+    border-top: 1px solid #ece9fb;
+    box-shadow: 0 -10px 24px rgba(79,70,229,0.05);
 }
 
 .profile-footer-text {
     color: #94a3b8;
-    font-size: 11px;
+    font-size: 11.5px;
+    font-weight: 600;
 }
 
 .profile-footer-actions {
@@ -1059,24 +1342,44 @@ textarea.profile-input {
     align-items: center;
 }
 
-/* PREMIUM PURPLE-PINK BUTTONS */
-
 .profile-footer button {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     border: none;
-    padding: 11px 25px;
-    border-radius: 25px;
+    padding: 12px 26px;
+    border-radius: 999px;
     background: linear-gradient(135deg, #6d28d9, #8b5cf6, #c026d3);
     color: white;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 16px rgba(109,40,217,0.30);
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+    box-shadow: 0 6px 18px rgba(109,40,217,0.32), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.profile-footer button::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: -80%;
+    width: 55%;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent, rgba(255,255,255,0.4), transparent);
+    transform: skewX(-18deg);
+    transition: left .7s ease;
+}
+
+.profile-footer button:hover::after {
+    left: 130%;
 }
 
 .profile-footer button:hover {
     transform: translateY(-3px);
     background: linear-gradient(135deg, #5b21b6, #7c3aed, #a21caf);
-    box-shadow: 0 9px 22px rgba(109,40,217,0.40);
+    box-shadow: 0 10px 24px rgba(109,40,217,0.42);
 }
 
 .profile-footer button:active {
@@ -1090,13 +1393,13 @@ textarea.profile-input {
 }
 
 .profile-footer .cancel-btn {
-    background: #e2e8f0;
+    background: #eef0f6;
     color: #334155;
     box-shadow: none;
 }
 
 .profile-footer .cancel-btn:hover {
-    background: #cbd5e1;
+    background: #e2e8f0;
     box-shadow: none;
 }
 
@@ -1124,32 +1427,64 @@ textarea.profile-input {
     .header {
         padding: 0 20px;
     }
+
+    .welcome h1 {
+        font-size: 32px;
+    }
 }
 
 @media(max-width: 600px) {
 
+    .profile-overlay {
+        padding: 12px;
+    }
+
     .profile-modal {
-        max-height: 90vh;
+        max-height: 94vh;
+        border-radius: 24px;
     }
 
     .profile-banner {
-        padding: 25px 20px;
+        padding: 20px 20px 24px;
+    }
+
+    .profile-brand {
+        gap: 8px;
+        padding: 6px 12px 6px 6px;
+    }
+
+    .pb-name {
+        font-size: 15px;
+    }
+
+    .pb-tag {
+        font-size: 9px;
+        letter-spacing: 1.2px;
     }
 
     .profile-identity {
-        gap: 14px;
+        gap: 16px;
+        margin-top: 22px;
     }
 
     .profile-avatar {
-        width: 65px;
-        height: 65px;
-        min-width: 65px;
-        border-radius: 19px;
-        font-size: 23px;
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        border-radius: 21px;
+        font-size: 26px;
+    }
+
+    .profile-avatar::after {
+        width: 23px;
+        height: 23px;
+        right: -6px;
+        bottom: -6px;
+        font-size: 11px;
     }
 
     .profile-identity h2 {
-        font-size: 19px;
+        font-size: 22px;
     }
 
     .profile-body {
@@ -1165,7 +1500,7 @@ textarea.profile-input {
     }
 
     .profile-footer {
-        padding: 16px 18px;
+        padding: 14px 18px;
         flex-direction: column;
         align-items: stretch;
     }
@@ -1175,11 +1510,11 @@ textarea.profile-input {
     }
 
     .profile-footer-text {
-        font-size: 10px;
+        font-size: 10.5px;
     }
 
     .logo {
-        font-size: 21px;
+        font-size: 22px;
     }
 
     .user-section {
@@ -1203,6 +1538,22 @@ textarea.profile-input {
         padding: 20px 18px 18px;
         border-radius: 22px;
     }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .spark path.line,
+    .card-foot-dot::after,
+    .profile-modal,
+    .profile-overlay.active,
+    .profile-item { animation: none; }
+    .spark path.line { stroke-dashoffset: 0; }
+    .card, .card::after, .action, .action::after, .progress-fill,
+    .user-name, .logout-btn,
+    .profile-item, .profile-footer button { transition: none; }
+    .user-name::after, .logout-btn::after,
+    .profile-footer button::after { display: none; }
+    .profile-brand::after { animation: none; display: none; }
 }
 
 </style>
@@ -1469,6 +1820,9 @@ textarea.profile-input {
      onclick="closeProfileOutside(event)">
 
     <div class="profile-modal"
+         role="dialog"
+         aria-modal="true"
+         aria-label="My profile"
          onclick="event.stopPropagation()">
 
         <div class="profile-banner">
@@ -1476,11 +1830,15 @@ textarea.profile-input {
             <div class="profile-top">
 
                 <div class="profile-brand">
-                    FINOVA | MY PROFILE
+                    <span class="pb-logo"><span class="pb-f">F</span><span class="pb-leaf"></span></span>
+                    <span class="pb-name">FIN<span>OVA</span></span>
+                    <span class="pb-divider"></span>
+                    <span class="pb-tag">✦ My Profile</span>
                 </div>
 
                 <button class="profile-close"
                         type="button"
+                        aria-label="Close profile"
                         onclick="closeUserProfile()">
 
                     &times;
@@ -1505,7 +1863,7 @@ textarea.profile-input {
 
                     <div class="profile-badges">
 
-                        <span class="profile-badge">
+                        <span class="profile-badge member">
                             ✦ FINOVA MEMBER
                         </span>
 
@@ -1843,21 +2201,25 @@ function displayUserProfile(data) {
     const personalFields = [
 
         {
+            icon: "👤",
             label: "Full Name",
             value: data.userName
         },
 
         {
+            icon: "🎂",
             label: "Date of Birth",
             value: data.dob
         },
 
         {
+            icon: "🧑",
             label: "Gender",
             value: data.gender
         },
 
         {
+            icon: "💍",
             label: "Marital Status",
             value: data.maritalStatus
         }
@@ -1867,16 +2229,19 @@ function displayUserProfile(data) {
     const contactFields = [
 
         {
+            icon: "📱",
             label: "Mobile Number",
             value: data.mobileNo || data.mobile
         },
 
         {
+            icon: "✉️",
             label: "Email Address",
             value: data.email
         },
 
         {
+            icon: "📍",
             label: "Residential Address",
             value: data.address,
             fullWidth: true
@@ -1886,21 +2251,38 @@ function displayUserProfile(data) {
 
     function createFields(fields) {
 
-        return fields.map(field => `
+        return fields.map(field => {
+
+            const isEmpty =
+                field.value === null ||
+                field.value === undefined ||
+                String(field.value).trim() === "";
+
+            return `
 
             <div class="profile-item ${field.fullWidth ? 'full-width' : ''}">
 
-                <div class="profile-label">
-                    ${escapeProfileText(field.label)}
+                <div class="pi-icon" aria-hidden="true">
+                    ${field.icon}
                 </div>
 
-                <div class="profile-value">
-                    ${escapeProfileText(field.value)}
+                <div class="pi-text">
+
+                    <div class="profile-label">
+                        ${escapeProfileText(field.label)}
+                    </div>
+
+                    <div class="profile-value ${isEmpty ? 'is-empty' : ''}">
+                        ${escapeProfileText(field.value)}
+                    </div>
+
                 </div>
 
             </div>
 
-        `).join("");
+            `;
+
+        }).join("");
 
     }
 
@@ -1998,7 +2380,7 @@ function enableProfileEdit() {
 
             <div class="profile-grid">
 
-                <div class="profile-item">
+                <div class="profile-item editing">
 
                     <div class="profile-label">
                         Full Name
@@ -2012,7 +2394,7 @@ function enableProfileEdit() {
 
                 </div>
 
-                <div class="profile-item">
+                <div class="profile-item editing">
 
                     <div class="profile-label">
                         Date of Birth
@@ -2025,7 +2407,7 @@ function enableProfileEdit() {
 
                 </div>
 
-                <div class="profile-item">
+                <div class="profile-item editing">
 
                     <div class="profile-label">
                         Gender
@@ -2038,7 +2420,7 @@ function enableProfileEdit() {
 
                 </div>
 
-                <div class="profile-item">
+                <div class="profile-item editing">
 
                     <div class="profile-label">
                         Marital Status
@@ -2089,7 +2471,7 @@ function enableProfileEdit() {
 
             <div class="profile-grid">
 
-                <div class="profile-item">
+                <div class="profile-item editing">
 
                     <div class="profile-label">
                         Mobile Number
@@ -2103,7 +2485,7 @@ function enableProfileEdit() {
 
                 </div>
 
-                <div class="profile-item">
+                <div class="profile-item editing">
 
                     <div class="profile-label">
                         Email Address
@@ -2117,7 +2499,7 @@ function enableProfileEdit() {
 
                 </div>
 
-                <div class="profile-item full-width">
+                <div class="profile-item editing full-width">
 
                     <div class="profile-label">
                         Residential Address
@@ -2170,7 +2552,7 @@ function enableProfileEdit() {
 
 
 /* =========================
-   PREMIUM SUCCESS MESSAGE
+   SUCCESS MESSAGE
 ========================= */
 
 function showProfileSuccessMessage() {
@@ -2398,7 +2780,7 @@ async function saveProfileChanges() {
 
         displayUserProfile(currentProfileData);
 
-        /* SHOW PREMIUM SUCCESS NOTIFICATION */
+        /* SHOW SUCCESS NOTIFICATION */
 
         showProfileSuccessMessage();
 
@@ -2554,5 +2936,4 @@ document.addEventListener("keydown", function(event) {
 </script>
 
 </body>
-
 </html>

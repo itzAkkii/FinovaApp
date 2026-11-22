@@ -1,6 +1,7 @@
 package com.finance.service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,8 @@ public class FundManagementServiceImpl implements FundManagementService {
 	private final CustomerService customerService;
 
 	public FundManagementServiceImpl(HttpSession httpSession, FinUtils finUtils,
-			FundManagementRepository fundManagementRepository, FinTransactionRepository transactionRepository, CustomerService customerService) {
+			FundManagementRepository fundManagementRepository, FinTransactionRepository transactionRepository,
+			CustomerService customerService) {
 		this.httpSession = httpSession;
 		this.finUtils = finUtils;
 		this.fundManagementRepository = fundManagementRepository;
@@ -40,12 +42,12 @@ public class FundManagementServiceImpl implements FundManagementService {
 	@Override
 	public FinFundTransactionDetails fundTransfer(FundTransactionRequest fundTransactionRequest) {
 		log.debug("[{}] Fund Transfer Service :: {}", httpSession.getId(), fundTransactionRequest);
-		
+
 		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
-                .orElseThrow(() -> {
-                    log.debug("[{}] ==> Please login to access this service", httpSession.getId());
-                    return new FinovaException("MPAY1019", "Please login to access this service");
-                });
+				.orElseThrow(() -> {
+					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+					return new FinovaException("MPAY1019", "Please login to access this service");
+				});
 
 		FinFundTransactionDetails finFundTransactionDetails = new FinFundTransactionDetails();
 		finFundTransactionDetails
@@ -122,173 +124,139 @@ public class FundManagementServiceImpl implements FundManagementService {
 	@Override
 	public List<FinFundTransactionDetails> findFunds() {
 		log.debug("[{}] Find Funds Service ::", httpSession.getId());
-		
-		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
-                .orElseThrow(() -> {
-                    log.debug("[{}] ==> Please login to access this service", httpSession.getId());
-                    return new FinovaException("MPAY1019", "Please login to access this service");
-                });
-		log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
 
-		return Optional.ofNullable(this.fundManagementRepository.findAll()).filter(list -> !list.isEmpty())
+		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
 				.orElseThrow(() -> {
-					log.error("[{}] ==> Goals Not Found", httpSession.getId());
-					throw new FinovaException("FIN1002", "Funds Not Found");
+					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+					return new FinovaException("MPAY1019", "Please login to access this service");
 				});
+
+		return Optional.ofNullable(this.fundManagementRepository.getAllFunds(finovaUserDetails.getUserId()))
+				.orElse(Collections.emptyList());
 	}
 
+	@Override
+	public FinFundTransactionDetails updateEvent(FundTransactionRequest request) {
+		log.debug("[{}] Fund Updation Service {}", httpSession.getId(), request);
 
-@Override
-public FinFundTransactionDetails updateEvent(FundTransactionRequest request) {
+		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
+				.orElseThrow(() -> {
+					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+					return new FinovaException("MPAY1019", "Please login to access this service");
+				});
 
-    log.debug("[{}] Fund Updation Service {}", httpSession.getId(), request);
+		log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
 
-    FinovaUserDetails finovaUserDetails = Optional
-            .ofNullable(this.customerService.getFinovaUser())
-            .orElseThrow(() -> {
-                log.debug("[{}] ==> Please login to access this service", httpSession.getId());
-                return new FinovaException("MPAY1019", "Please login to access this service");
-            });
+		String fundId = request.getFundId();
 
-    log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
+		if (fundId == null || fundId.isBlank()) {
+			throw new FinovaException("FIN1002", "Fund ID not found");
+		}
 
-    String fundId = request.getFundId();
+		FinFundTransactionDetails existingFundDetails = fundManagementRepository.findById(fundId)
+				.orElseThrow(() -> new FinovaException("FIN1002", "Fund Not Found"));
 
-    if (fundId == null || fundId.isBlank()) {
-        throw new FinovaException("FIN1002", "Fund ID not found");
-    }
+		// Validate fund ownership
+		if (!existingFundDetails.getUserId().equals(finovaUserDetails.getUserId())) {
+			throw new FinovaException("FIN1002", "Invalid Fund Details");
+		}
 
-    FinFundTransactionDetails existingFundDetails = fundManagementRepository.findById(fundId)
-            .orElseThrow(() -> new FinovaException("FIN1002", "Fund Not Found"));
+		BigDecimal totalAmount = new BigDecimal(existingFundDetails.getTotalAmount());
 
-    // Validate fund ownership
-    if (!existingFundDetails.getUserId().equals(finovaUserDetails.getUserId())) {
-        throw new FinovaException("FIN1002", "Invalid Fund Details");
-    }
+		BigDecimal alreadyPaid = existingFundDetails.getRepaidAmount() == null
+				|| existingFundDetails.getRepaidAmount().isBlank() ? BigDecimal.ZERO
+						: new BigDecimal(existingFundDetails.getRepaidAmount());
 
-    BigDecimal totalAmount = new BigDecimal(existingFundDetails.getTotalAmount());
+		if (request.getPaidAmount() == null || request.getPaidAmount().isBlank()) {
+			throw new FinovaException("FIN1002", "Paid Amount is required");
+		}
 
-    BigDecimal alreadyPaid = existingFundDetails.getRepaidAmount() == null
-            || existingFundDetails.getRepaidAmount().isBlank()
-                    ? BigDecimal.ZERO
-                    : new BigDecimal(existingFundDetails.getRepaidAmount());
+		BigDecimal currentPayment = new BigDecimal(request.getPaidAmount());
 
-    if (request.getPaidAmount() == null || request.getPaidAmount().isBlank()) {
-        throw new FinovaException("FIN1002", "Paid Amount is required");
-    }
+		if (currentPayment.compareTo(BigDecimal.ZERO) <= 0) {
+			throw new FinovaException("FIN1002", "Payment must be greater than zero");
+		}
 
-    BigDecimal currentPayment = new BigDecimal(request.getPaidAmount());
+		BigDecimal updatedPaidAmount = alreadyPaid.add(currentPayment);
 
-    if (currentPayment.compareTo(BigDecimal.ZERO) <= 0) {
-        throw new FinovaException("FIN1002", "Payment must be greater than zero");
-    }
+		if (updatedPaidAmount.compareTo(totalAmount) > 0) {
+			throw new FinovaException("FIN1002", "Payment exceeds remaining amount");
+		}
 
-    BigDecimal updatedPaidAmount = alreadyPaid.add(currentPayment);
+		BigDecimal remainingAmount = totalAmount.subtract(updatedPaidAmount);
 
-    if (updatedPaidAmount.compareTo(totalAmount) > 0) {
-        throw new FinovaException("FIN1002", "Payment exceeds remaining amount");
-    }
+		// Update fund payment details
+		existingFundDetails.setRepaidAmount(updatedPaidAmount.toString());
+		existingFundDetails.setRemainingAmount(remainingAmount.toString());
 
-    BigDecimal remainingAmount = totalAmount.subtract(updatedPaidAmount);
+		Optional.ofNullable(request.getPersonName()).ifPresent(existingFundDetails::setPersonName);
+		Optional.ofNullable(request.getPaymentMode()).ifPresent(existingFundDetails::setTransactionType);
+		Optional.ofNullable(request.getFundType()).ifPresent(existingFundDetails::setFundType);
+		Optional.ofNullable(request.getDueDate()).ifPresent(existingFundDetails::setDueDate);
+		Optional.ofNullable(request.getDescription()).ifPresent(existingFundDetails::setRemarks);
 
-    // Update fund payment details
-    existingFundDetails.setRepaidAmount(updatedPaidAmount.toString());
-    existingFundDetails.setRemainingAmount(remainingAmount.toString());
+		existingFundDetails.setTxnDate(finUtils.getDate());
 
-    Optional.ofNullable(request.getPersonName())
-            .ifPresent(existingFundDetails::setPersonName);
+		// Update fund status based on remaining amount
+		existingFundDetails.setFundStatus(remainingAmount.compareTo(BigDecimal.ZERO) == 0 ? "COMPLETED" : "ACTIVE");
+		existingFundDetails.setStatus("S");
 
-    Optional.ofNullable(request.getPaymentMode())
-            .ifPresent(existingFundDetails::setTransactionType);
+		log.debug("[{}] ==> Updating Fund Details ==> {}", httpSession.getId(), existingFundDetails);
+		FinFundTransactionDetails savedFundDetails = fundManagementRepository.save(existingFundDetails);
+		log.debug("[{}] ==> Fund Updated Successfully ==> {}", httpSession.getId(), savedFundDetails);
 
-    Optional.ofNullable(request.getFundType())
-            .ifPresent(existingFundDetails::setFundType);
+		// Create individual repayment transaction
+		FinTransactionDetails finTransactionDetails = new FinTransactionDetails();
 
-    Optional.ofNullable(request.getDueDate())
-            .ifPresent(existingFundDetails::setDueDate);
+		String txnId = "CUST" + this.finUtils.getDateyyyyMMddHHmmss() + this.finUtils.generateRandomString(4);
 
-    Optional.ofNullable(request.getDescription())
-            .ifPresent(existingFundDetails::setRemarks);
+		finTransactionDetails.setFinTxnId("FIN" + this.finUtils.dateFormat() + this.finUtils.generateRandomString(2));
 
-    existingFundDetails.setTxnDate(finUtils.getDate());
+		finTransactionDetails.setTransactionId(txnId);
+		finTransactionDetails.setTransactionReferenceNumber(fundId);
+		finTransactionDetails.setTransactionTitle("Fund-Repayment");
+		finTransactionDetails.setAmount(currentPayment.toString());
+		finTransactionDetails.setPaymentMode(request.getPaymentMode());
+		finTransactionDetails.setCurrency("INR");
+		finTransactionDetails.setTransactionCategory("FUND");
 
-    // Update fund status based on remaining amount
-    existingFundDetails.setFundStatus(
-            remainingAmount.compareTo(BigDecimal.ZERO) == 0 ? "COMPLETED" : "ACTIVE"
-    );
+		String fundType = existingFundDetails.getFundType();
 
-    existingFundDetails.setStatus("S");
+		if ("GIVEN".equalsIgnoreCase(fundType)) {
+			finTransactionDetails.setTransactionType("INCOME");
+			finTransactionDetails.setTransactionTitle("Received-Money");
+		} else if ("RECEIVED".equalsIgnoreCase(fundType)) {
+			finTransactionDetails.setTransactionType("EXPENSE");
+			finTransactionDetails.setTransactionTitle("Repaid-Money");
+		} else {
+			throw new FinovaException("FIN1002", "Invalid Fund Type");
+		}
 
-    log.debug("[{}] ==> Updating Fund Details ==> {}",
-            httpSession.getId(), existingFundDetails);
+		Optional.ofNullable(request.getDescription()).ifPresent(finTransactionDetails::setDescription);
 
-    FinFundTransactionDetails savedFundDetails =
-            fundManagementRepository.save(existingFundDetails);
+		finTransactionDetails.setDate(finUtils.getDate());
+		finTransactionDetails.setDateAndTime(finUtils.getDateAndTime());
+		finTransactionDetails.setStatus("S");
+		finTransactionDetails.setUserId(finovaUserDetails.getUserId());
 
-    log.debug("[{}] ==> Fund Updated Successfully ==> {}",
-            httpSession.getId(), savedFundDetails);
+		log.debug("[{}] ==> Adding Repayment Transaction ==> {}", httpSession.getId(), finTransactionDetails);
 
-    // Create individual repayment transaction
-    FinTransactionDetails finTransactionDetails = new FinTransactionDetails();
+		FinTransactionDetails savedTransaction = transactionRepository.save(finTransactionDetails);
 
-    String txnId = "CUST" + this.finUtils.getDateyyyyMMddHHmmss()
-            + this.finUtils.generateRandomString(4);
+		log.debug("[{}] ==> Repayment Transaction Saved Successfully ==> {}", httpSession.getId(), savedTransaction);
 
-    finTransactionDetails.setFinTxnId(
-            "FIN" + this.finUtils.dateFormat()
-                    + this.finUtils.generateRandomString(2)
-    );
-
-    finTransactionDetails.setTransactionId(txnId);
-    finTransactionDetails.setTransactionReferenceNumber(fundId);
-    finTransactionDetails.setTransactionTitle("Fund-Repayment");
-    finTransactionDetails.setAmount(currentPayment.toString());
-    finTransactionDetails.setPaymentMode(request.getPaymentMode());
-    finTransactionDetails.setCurrency("INR");
-    finTransactionDetails.setTransactionCategory("FUND");
-
-    String fundType = existingFundDetails.getFundType();
-
-    if ("GIVEN".equalsIgnoreCase(fundType)) {
-        finTransactionDetails.setTransactionType("INCOME");
-        finTransactionDetails.setTransactionTitle("Received-Money");
-    } else if ("RECEIVED".equalsIgnoreCase(fundType)) {
-        finTransactionDetails.setTransactionType("EXPENSE");
-        finTransactionDetails.setTransactionTitle("Repaid-Money");
-    } else {
-        throw new FinovaException("FIN1002", "Invalid Fund Type");
-    }
-
-    Optional.ofNullable(request.getDescription())
-            .ifPresent(finTransactionDetails::setDescription);
-
-    finTransactionDetails.setDate(finUtils.getDate());
-    finTransactionDetails.setDateAndTime(finUtils.getDateAndTime());
-    finTransactionDetails.setStatus("S");
-    finTransactionDetails.setUserId(finovaUserDetails.getUserId());
-
-    log.debug("[{}] ==> Adding Repayment Transaction ==> {}",
-            httpSession.getId(), finTransactionDetails);
-
-    FinTransactionDetails savedTransaction =
-            transactionRepository.save(finTransactionDetails);
-
-    log.debug("[{}] ==> Repayment Transaction Saved Successfully ==> {}",
-            httpSession.getId(), savedTransaction);
-
-    return savedFundDetails;
-}
-
+		return savedFundDetails;
+	}
 
 	@Override
 	public String deleteFund(String id) {
 		log.debug("[{}] Fund Deleted Service {}:: ", httpSession.getId(), id);
-		
+
 		FinovaUserDetails finovaUserDetails = Optional.ofNullable(this.customerService.getFinovaUser())
-                .orElseThrow(() -> {
-                    log.debug("[{}] ==> Please login to access this service", httpSession.getId());
-                    return new FinovaException("MPAY1019", "Please login to access this service");
-                });
+				.orElseThrow(() -> {
+					log.debug("[{}] ==> Please login to access this service", httpSession.getId());
+					return new FinovaException("MPAY1019", "Please login to access this service");
+				});
 		log.debug("[{}] finovaUserDetails ==> :: {}", httpSession.getId(), finovaUserDetails);
 
 		if (id == null) {
